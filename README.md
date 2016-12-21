@@ -1,9 +1,15 @@
 # FBReaderJ
 
-1.官网:https://fbreader.org/
+1.Android studio版本环境
 
-2.Android studio版本环境
+# 针对这个项目的简单说明
 
-3.版本:
-    android:versionCode="2051010"
-    android:versionName="2.5.10"
+1.去除了原有的网络模块
+
+2.去除了本地书库，和网络书库
+
+3.针对设置界面做了简化
+
+4.阅读背景的替换
+
+5.后续会继续优化。
