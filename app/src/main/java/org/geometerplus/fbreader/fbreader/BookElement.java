@@ -19,9 +19,6 @@
 
 package org.geometerplus.fbreader.fbreader;
 
-import org.geometerplus.fbreader.network.NetworkImage;
-import org.geometerplus.fbreader.network.opds.OPDSBookItem;
-import org.geometerplus.fbreader.network.urlInfo.UrlInfo;
 import org.geometerplus.zlibrary.core.image.ZLImageData;
 import org.geometerplus.zlibrary.core.image.ZLImageManager;
 import org.geometerplus.zlibrary.core.library.ZLibrary;
@@ -35,43 +32,21 @@ public final class BookElement extends ExtensionElement {
 
     private final FBView myView;
 
-    private OPDSBookItem myItem;
-    private NetworkImage myCover;
+//    private NetworkImage myCover;
 
     BookElement(FBView view) {
         myView = view;
     }
 
-    public void setData(OPDSBookItem item) {
-        final String bookUrl = item.getUrl(UrlInfo.Type.Book);
-        String coverUrl = item.getUrl(UrlInfo.Type.Image);
-        if (coverUrl == null) {
-            coverUrl = item.getUrl(UrlInfo.Type.Thumbnail);
-        }
-        if (bookUrl == null || coverUrl == null) {
-            myItem = null;
-            myCover = null;
-        }else {
-            myItem = item;
-            myCover = new NetworkImage(coverUrl, myView.Application.SystemInfo);
-            myCover.synchronize();
-        }
-    }
 
-    public boolean isInitialized() {
-        return myItem != null && myCover != null;
-    }
 
-    public OPDSBookItem getItem() {
-        return myItem;
-    }
 
-    public ZLImageData getImageData() {
-        if (myCover == null) {
-            return null;
-        }
-        return ZLImageManager.Instance().getImageData(myCover);
-    }
+//    public ZLImageData getImageData() {
+//        if (myCover == null) {
+//            return null;
+//        }
+//        return ZLImageManager.Instance().getImageData(myCover);
+//    }
 
     @Override
     protected int getWidth() {
@@ -89,10 +64,10 @@ public final class BookElement extends ExtensionElement {
     protected void draw(ZLPaintContext context, ZLTextElementArea area) {
         final int vMargin = ZLibrary.Instance().getDisplayDPI() / 15;
         final int hMargin = ZLibrary.Instance().getDisplayDPI() / 10;
-        final ZLImageData imageData = getImageData();
-        if (imageData != null) {
-            context.drawImage(area.XStart + hMargin, area.YEnd - vMargin, imageData, new ZLPaintContext.Size(area.XEnd - area.XStart - 2 * hMargin + 1, area.YEnd - area.YStart - 2 * vMargin + 1), ZLPaintContext.ScalingType.FitMaximum, ZLPaintContext.ColorAdjustingMode.NONE);
-        }else {
+//        final ZLImageData imageData = getImageData();
+//        if (imageData != null) {
+//            context.drawImage(area.XStart + hMargin, area.YEnd - vMargin, imageData, new ZLPaintContext.Size(area.XEnd - area.XStart - 2 * hMargin + 1, area.YEnd - area.YStart - 2 * vMargin + 1), ZLPaintContext.ScalingType.FitMaximum, ZLPaintContext.ColorAdjustingMode.NONE);
+//        }else {
             final ZLColor color = myView.getTextColor(ZLTextHyperlink.NO_LINK);
             context.setLineColor(color);
             context.setFillColor(color, 0x33);
@@ -105,6 +80,6 @@ public final class BookElement extends ExtensionElement {
             context.drawLine(xStart, yEnd, xEnd, yEnd);
             context.drawLine(xEnd, yEnd, xEnd, yStart);
             context.drawLine(xEnd, yStart, xStart, yStart);
-        }
+//        }
     }
 }

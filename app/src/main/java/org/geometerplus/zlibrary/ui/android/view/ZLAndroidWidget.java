@@ -129,9 +129,6 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
                 case slide:
                     myAnimationProvider = new SlideAnimationProvider(myBitmapManager);
                     break;
-                case slideOldStyle:
-                    myAnimationProvider = new SlideOldStyleAnimationProvider(myBitmapManager);
-                    break;
                 case shift:
                     myAnimationProvider = new ShiftAnimationProvider(myBitmapManager);
                     break;
@@ -264,11 +261,8 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
         final ZLAndroidPaintContext context = new ZLAndroidPaintContext(mySystemInfo, new Canvas(myFooterBitmap), new ZLAndroidPaintContext.Geometry(getWidth(), getHeight(), getWidth(), footer.getHeight(), 0, getMainAreaHeight()), view.isScrollbarShown() ? getVerticalScrollbarWidth() : 0);
         footer.paint(context);
         final int voffset = getHeight() - footer.getHeight();
-        if (animator != null) {
-            animator.drawFooterBitmap(canvas, myFooterBitmap, voffset);
-        }else {
+
             canvas.drawBitmap(myFooterBitmap, 0, voffset, myPaint);
-        }
     }
 
     /**

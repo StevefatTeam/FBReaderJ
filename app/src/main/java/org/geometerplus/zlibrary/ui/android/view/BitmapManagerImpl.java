@@ -99,7 +99,7 @@ final class BitmapManagerImpl implements BitmapManager {
         }
     }
 
-    void shift(boolean forward) {
+    public void shift(boolean forward) {
         for (int i = 0; i < SIZE; ++i) {
             if (myIndexes[i] == null) {
                 continue;

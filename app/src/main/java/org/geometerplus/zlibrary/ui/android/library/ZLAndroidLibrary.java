@@ -28,6 +28,8 @@ import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
+import android.view.WindowManager;
+
 import org.geometerplus.android.util.DeviceType;
 import org.geometerplus.zlibrary.core.filesystem.ZLFile;
 import org.geometerplus.zlibrary.core.filesystem.ZLResourceFile;
@@ -38,13 +40,11 @@ import org.geometerplus.zlibrary.core.options.ZLIntegerRangeOption;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-
 public final class ZLAndroidLibrary extends ZLibrary {
-
-    public final ZLBooleanOption ShowStatusBarOption = new ZLBooleanOption("LookNFeel", "ShowStatusBar", false);
-    public final ZLBooleanOption OldShowActionBarOption = new ZLBooleanOption("LookNFeel", "ShowActionBar", true);
-    public final ZLBooleanOption ShowActionBarOption = new ZLBooleanOption("LookNFeel", "ShowActionBarNew", false);
-    public final ZLBooleanOption EnableFullscreenModeOption = new ZLBooleanOption("LookNFeel", "FullscreenMode", true);
+    public final ZLBooleanOption ShowStatusBarOption = new ZLBooleanOption("LookNFeel", "ShowStatusBar", false); // 底部状态栏
+    public final ZLBooleanOption OldShowActionBarOption = new ZLBooleanOption("LookNFeel", "ShowActionBar", false);
+    public final ZLBooleanOption ShowActionBarOption = new ZLBooleanOption("LookNFeel", "ShowActionBarNew", true);
+    public final ZLBooleanOption EnableFullscreenModeOption = new ZLBooleanOption("LookNFeel", "FullscreenMode", false);
     public final ZLBooleanOption DisableButtonLightsOption = new ZLBooleanOption("LookNFeel", "DisableButtonLights", !DeviceType.Instance().hasButtonLightsBug());
 
     {
@@ -55,9 +55,9 @@ public final class ZLAndroidLibrary extends ZLibrary {
         DisableButtonLightsOption.setSpecialName("disableButtonLights");
     }
 
-    public final ZLIntegerRangeOption BatteryLevelToTurnScreenOffOption = new ZLIntegerRangeOption("LookNFeel", "BatteryLevelToTurnScreenOff", 0, 100, 50);
-    public final ZLBooleanOption DontTurnScreenOffDuringChargingOption = new ZLBooleanOption("LookNFeel", "DontTurnScreenOffDuringCharging", true);
-    public final ZLIntegerRangeOption ScreenBrightnessLevelOption = new ZLIntegerRangeOption("LookNFeel", "ScreenBrightnessLevel", 0, 100, 0);
+    public final ZLIntegerRangeOption BatteryLevelToTurnScreenOffOption = new ZLIntegerRangeOption("LookNFeel", "BatteryLevelToTurnScreenOff", 0, 100, 50); //y 电池电量
+    //    public final ZLBooleanOption DontTurnScreenOffDuringChargingOption = new ZLBooleanOption("LookNFeel", "DontTurnScreenOffDuringCharging", true); // 屏幕方向
+    public final ZLIntegerRangeOption ScreenBrightnessLevelOption = new ZLIntegerRangeOption("LookNFeel", "ScreenBrightnessLevel", 0, 100, 0); // 屏幕亮度
 
     private final Application myApplication;
 
@@ -76,25 +76,41 @@ public final class ZLAndroidLibrary extends ZLibrary {
 
     @Override
     public ZLResourceFile createResourceFile(ZLResourceFile parent, String name) {
-        return new AndroidAssetsFile((AndroidAssetsFile)parent, name);
+        return new AndroidAssetsFile((AndroidAssetsFile) parent, name);
     }
 
     @Override
     public String getVersionName() {
         try {
-            final PackageInfo info = myApplication.getPackageManager().getPackageInfo(myApplication.getPackageName(), 0);
+            final PackageInfo info =
+                    myApplication.getPackageManager().getPackageInfo(myApplication.getPackageName(), 0);
             return info.versionName;
-        }catch (Exception e) {
+        } catch (Exception e) {
             return "";
         }
     }
 
     @Override
+    public int getScreenWidth() {
+        WindowManager wm = (WindowManager) myApplication
+                .getSystemService(Context.WINDOW_SERVICE);
+        return wm.getDefaultDisplay().getWidth();
+    }
+
+    @Override
+    public int getScreenHeight() {
+        WindowManager wm = (WindowManager) myApplication
+                .getSystemService(Context.WINDOW_SERVICE);
+        return wm.getDefaultDisplay().getHeight();
+    }
+
+    @Override
     public String getFullVersionName() {
         try {
-            final PackageInfo info = myApplication.getPackageManager().getPackageInfo(myApplication.getPackageName(), 0);
+            final PackageInfo info =
+                    myApplication.getPackageManager().getPackageInfo(myApplication.getPackageName(), 0);
             return info.versionName + " (" + info.versionCode + ")";
-        }catch (Exception e) {
+        } catch (Exception e) {
             return "";
         }
     }
@@ -114,9 +130,26 @@ public final class ZLAndroidLibrary extends ZLibrary {
     }
 
     @Override
+    public String getExternalCacheDir() {
+        return myApplication.getExternalCacheDir().getPath();
+    }
+
+    @Override
     public int getDisplayDPI() {
         final DisplayMetrics metrics = getMetrics();
-        return metrics == null ? 0 : (int)(160 * metrics.density);
+        return metrics == null ? 0 : (int) (160 * metrics.density);
+    }
+
+    @Override
+    public float getDPI() {
+        final DisplayMetrics metrics = getMetrics();
+        return metrics == null ? 0 : metrics.density;
+    }
+
+    @Override
+    public float getSP() {
+        final DisplayMetrics metrics = getMetrics();
+        return metrics == null ? 0 : metrics.scaledDensity;
     }
 
     @Override
@@ -135,7 +168,7 @@ public final class ZLAndroidLibrary extends ZLibrary {
     public List<String> defaultLanguageCodes() {
         final TreeSet<String> set = new TreeSet<String>();
         set.add(Locale.getDefault().getLanguage());
-        final TelephonyManager manager = (TelephonyManager)myApplication.getSystemService(Context.TELEPHONY_SERVICE);
+        final TelephonyManager manager = (TelephonyManager) myApplication.getSystemService(Context.TELEPHONY_SERVICE);
         if (manager != null) {
             String country0 = manager.getSimCountryIso();
             if (country0 != null) {
@@ -148,15 +181,15 @@ public final class ZLAndroidLibrary extends ZLibrary {
             for (Locale locale : Locale.getAvailableLocales()) {
                 final String country = locale.getCountry().toLowerCase();
                 if (country != null && country.length() > 0 &&
-                    (country.equals(country0) || country.equals(country1))) {
+                        (country.equals(country0) || country.equals(country1))) {
                     set.add(locale.getLanguage());
                 }
             }
             if ("ru".equals(country0) || "ru".equals(country1)) {
                 set.add("ru");
-            }else if ("by".equals(country0) || "by".equals(country1)) {
+            } else if ("by".equals(country0) || "by".equals(country1)) {
                 set.add("ru");
-            }else if ("ua".equals(country0) || "ua".equals(country1)) {
+            } else if ("ua".equals(country0) || "ua".equals(country1)) {
                 set.add("ru");
             }
         }
@@ -170,7 +203,6 @@ public final class ZLAndroidLibrary extends ZLibrary {
     }
 
     private static interface StreamStatus {
-
         int UNKNOWN = -1;
         int NULL = 0;
         int OK = 1;
@@ -178,7 +210,6 @@ public final class ZLAndroidLibrary extends ZLibrary {
     }
 
     private final class AndroidAssetsFile extends ZLResourceFile {
-
         private final AndroidAssetsFile myParent;
 
         AndroidAssetsFile(AndroidAssetsFile parent, String name) {
@@ -190,7 +221,7 @@ public final class ZLAndroidLibrary extends ZLibrary {
             super(path);
             if (path.length() == 0) {
                 myParent = null;
-            }else {
+            } else {
                 final int index = path.lastIndexOf('/');
                 myParent = new AndroidAssetsFile(index >= 0 ? path.substring(0, path.lastIndexOf('/')) : "");
             }
@@ -207,7 +238,7 @@ public final class ZLAndroidLibrary extends ZLibrary {
                     }
                     return files;
                 }
-            }catch (IOException e) {
+            } catch (IOException e) {
             }
             return Collections.emptyList();
         }
@@ -220,11 +251,11 @@ public final class ZLAndroidLibrary extends ZLibrary {
                     final InputStream stream = myApplication.getAssets().open(getPath());
                     if (stream == null) {
                         myStreamStatus = StreamStatus.NULL;
-                    }else {
+                    } else {
                         stream.close();
                         myStreamStatus = StreamStatus.OK;
                     }
-                }catch (IOException e) {
+                } catch (IOException e) {
                     myStreamStatus = StreamStatus.EXCEPTION;
                 }
             }
@@ -255,7 +286,7 @@ public final class ZLAndroidLibrary extends ZLibrary {
                     // directory exists
                     return true;
                 }
-            }catch (IOException e) {
+            } catch (IOException e) {
             }
             return false;
         }
@@ -280,7 +311,7 @@ public final class ZLAndroidLibrary extends ZLibrary {
                 long length = descriptor.getLength();
                 descriptor.close();
                 return length;
-            }catch (IOException e) {
+            } catch (IOException e) {
                 return sizeSlow();
             }
         }
@@ -302,7 +333,7 @@ public final class ZLAndroidLibrary extends ZLibrary {
                     }
                 }
                 return size;
-            }catch (IOException e) {
+            } catch (IOException e) {
                 return 0;
             }
         }

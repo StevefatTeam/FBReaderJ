@@ -19,6 +19,8 @@
 
 package org.geometerplus.fbreader.formats.fb2;
 
+import com.orhanobut.logger.Logger;
+
 import org.geometerplus.fbreader.book.AbstractBook;
 import org.geometerplus.fbreader.bookmodel.BookModel;
 import org.geometerplus.fbreader.formats.BookReadingException;
@@ -41,6 +43,7 @@ public class FB2NativePlugin extends NativeFormatPlugin {
     @Override
     public void readModel(BookModel model) throws BookReadingException {
         super.readModel(model);
+        Logger.e("不知道是不是这里的解析*********----fb2");
         model.setLabelResolver(new BookModel.LabelResolver() {
             public List<String> getCandidates(String id) {
                 final List<String> candidates = new ArrayList<String>();

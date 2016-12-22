@@ -19,6 +19,8 @@
 
 package org.geometerplus.android.fbreader;
 
+import com.orhanobut.logger.Logger;
+
 import org.geometerplus.fbreader.fbreader.FBReaderApp;
 import org.geometerplus.zlibrary.text.model.ZLTextModel;
 import org.geometerplus.zlibrary.text.view.ZLTextView;
@@ -38,6 +40,7 @@ class ShowNavigationAction extends FBAndroidAction {
 
     @Override
     protected void run(Object... params) {
+        Logger.e("这个显示快速阅读的东西");
         BaseActivity.navigate();
     }
 }

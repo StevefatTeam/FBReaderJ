@@ -1,28 +1,12 @@
-/*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
- * 02110-1301, USA.
- */
-
 package org.geometerplus.zlibrary.ui.android.view.animation;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.util.FloatMath;
+
+
+import com.orhanobut.logger.Logger;
+
 import org.geometerplus.zlibrary.core.library.ZLibrary;
 import org.geometerplus.zlibrary.core.view.ZLViewEnums;
 
@@ -30,13 +14,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 public abstract class AnimationProvider {
-
     public static enum Mode {
         NoScrolling(false),
         PreManualScrolling(false),
-        ManualScrolling(false),
-        AnimatedScrollingForward(true),
-        AnimatedScrollingBackward(true);
+        ManualScrolling(false), // 手动滚动
+        AnimatedScrollingForward(true), // 向前滚动 变为向前滚动时,mode变为auto
+        AnimatedScrollingBackward(true); // 向后滚动
 
         public final boolean Auto;
 
@@ -81,19 +64,22 @@ public abstract class AnimationProvider {
         }
     }
 
+    // 1. 都没达到 一直返回PreManualScrolling
+    // 2. 达到滑动要求 返回ManualScrolling
+    // 3. 达到不滑动要求 返回NoScrolling
     private final Mode detectManualMode() {
         final int dX = Math.abs(myStartX - myEndX);
         final int dY = Math.abs(myStartY - myEndY);
         if (myDirection.IsHorizontal) {
             if (dY > ZLibrary.Instance().getDisplayDPI() / 2 && dY > dX) {
                 return Mode.NoScrolling;
-            }else if (dX > ZLibrary.Instance().getDisplayDPI() / 10) {
+            } else if (dX > ZLibrary.Instance().getDisplayDPI() / 10) {
                 return Mode.ManualScrolling;
             }
-        }else {
+        } else {
             if (dX > ZLibrary.Instance().getDisplayDPI() / 2 && dX > dY) {
                 return Mode.NoScrolling;
-            }else if (dY > ZLibrary.Instance().getDisplayDPI() / 10) {
+            } else if (dY > ZLibrary.Instance().getDisplayDPI() / 10) {
                 return Mode.ManualScrolling;
             }
         }
@@ -101,6 +87,7 @@ public abstract class AnimationProvider {
     }
 
     public final void scrollTo(int x, int y) {
+        Logger.e("myMode" + ":" + myMode + ":" + x + ":" + y);
         switch (myMode) {
             case ManualScrolling:
                 myEndX = x;
@@ -125,7 +112,9 @@ public abstract class AnimationProvider {
 
         final int dpi = ZLibrary.Instance().getDisplayDPI();
         final int diff = myDirection.IsHorizontal ? x - myStartX : y - myStartY;
-        final int minDiff = myDirection.IsHorizontal ? (myWidth > myHeight ? myWidth / 4 : myWidth / 3) : (myHeight > myWidth ? myHeight / 4 : myHeight / 3);
+        final int minDiff = myDirection.IsHorizontal
+                ? (myWidth > myHeight ? myWidth / 4 : myWidth / 3)
+                : (myHeight > myWidth ? myHeight / 4 : myHeight / 3);
         boolean forward = Math.abs(diff) > Math.min(minDiff, dpi / 2);
 
         myMode = forward ? Mode.AnimatedScrollingForward : Mode.AnimatedScrollingBackward;
@@ -145,7 +134,7 @@ public abstract class AnimationProvider {
                 final DrawInfo info1 = myDrawInfos.get(i);
                 final float dX = info0.X - info1.X;
                 final float dY = info0.Y - info1.Y;
-                velocity += FloatMath.sqrt(dX * dX + dY * dY) / Math.max(1, info1.Start - info0.Start);
+                velocity += Math.sqrt(dX * dX + dY * dY) / Math.max(1, info1.Start - info0.Start);
             }
             velocity /= myDrawInfos.size() - 1;
             velocity *= duration;
@@ -227,7 +216,6 @@ public abstract class AnimationProvider {
     }
 
     static class DrawInfo {
-
         final int X, Y;
         final long Start;
         final int Duration;
@@ -236,7 +224,7 @@ public abstract class AnimationProvider {
             X = x;
             Y = y;
             Start = start;
-            Duration = (int)(finish - start);
+            Duration = (int) (finish - start);
         }
     }
 
@@ -246,35 +234,48 @@ public abstract class AnimationProvider {
         final long start = System.currentTimeMillis();
         setFilter();
         drawInternal(canvas);
-        myDrawInfos.add(new DrawInfo(myEndX, myEndY, start, System.currentTimeMillis()));
+        myDrawInfos.add(new DrawInfo(myEndX, myEndY, start, System.currentTimeMillis())); // 保存位置信息
         if (myDrawInfos.size() > 3) {
             myDrawInfos.remove(0);
         }
     }
 
-    public final void drawFooterBitmap(Canvas canvas, Bitmap footerBitmap, int voffset) {
-        setFilter();
-        drawFooterBitmapInternal(canvas, footerBitmap, voffset);
-    }
+//    public final void drawFooterBitmap(Canvas canvas, Bitmap footerBitmap, int voffset) {
+//        setFilter();
+//        drawFooterBitmapInternal(canvas, footerBitmap, voffset);
+//    }
 
     protected abstract void setFilter();
 
     protected abstract void drawInternal(Canvas canvas);
 
-    protected abstract void drawFooterBitmapInternal(Canvas canvas, Bitmap footerBitmap, int voffset);
+//    protected abstract void drawFooterBitmapInternal(Canvas canvas, Bitmap footerBitmap, int voffset);
 
     public abstract ZLViewEnums.PageIndex getPageToScrollTo(int x, int y);
 
+    /**
+     * 传入endX 与startX进行对比,来判断 往前翻页 还是 往后翻页
+     */
     public final ZLViewEnums.PageIndex getPageToScrollTo() {
         return getPageToScrollTo(myEndX, myEndY);
     }
 
-    protected Bitmap getBitmapFrom() {
+    public Bitmap getBitmapFrom() {
         return myBitmapManager.getBitmap(ZLViewEnums.PageIndex.current);
     }
 
-    protected Bitmap getBitmapTo() {
+    public Bitmap getBitmapTo() {
         return myBitmapManager.getBitmap(getPageToScrollTo());
+    }
+
+    // added by leixun
+    public Bitmap getBitmapByPageIndex(ZLViewEnums.PageIndex index){
+        return myBitmapManager.getBitmap(index);
+    }
+
+    // true 左边翻到右边 ；false 右边翻到左边 added by leixun
+    protected void forwardShift(boolean params){
+        myBitmapManager.shift(params);
     }
 
     protected void drawBitmapFrom(Canvas canvas, int x, int y, Paint paint) {
@@ -284,4 +285,5 @@ public abstract class AnimationProvider {
     protected void drawBitmapTo(Canvas canvas, int x, int y, Paint paint) {
         myBitmapManager.drawBitmap(canvas, x, y, getPageToScrollTo(), paint);
     }
+
 }

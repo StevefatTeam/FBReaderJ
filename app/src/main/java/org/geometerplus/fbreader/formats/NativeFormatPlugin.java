@@ -19,6 +19,8 @@
 
 package org.geometerplus.fbreader.formats;
 
+import com.orhanobut.logger.Logger;
+
 import org.geometerplus.fbreader.book.AbstractBook;
 import org.geometerplus.fbreader.book.BookUtil;
 import org.geometerplus.fbreader.bookmodel.BookModel;
@@ -44,9 +46,10 @@ public class NativeFormatPlugin extends BuiltinFormatPlugin {
     public static NativeFormatPlugin create(SystemInfo systemInfo, String fileType) {
         if ("fb2".equals(fileType)) {
             return new FB2NativePlugin(systemInfo);
-        }else if ("ePub".equals(fileType)) {
+        } else if ("ePub".equals(fileType)) {
             return new OEBNativePlugin(systemInfo);
-        }else {
+        } else {
+            Logger.e("走的是这里的解析*************" + fileType);
             return new NativeFormatPlugin(systemInfo, fileType);
         }
     }
@@ -58,6 +61,7 @@ public class NativeFormatPlugin extends BuiltinFormatPlugin {
     @Override
     synchronized public void readMetainfo(AbstractBook book) throws BookReadingException {
         final int code;
+
         synchronized (ourNativeLock) {
             code = readMetainfoNative(book);
         }
@@ -74,7 +78,7 @@ public class NativeFormatPlugin extends BuiltinFormatPlugin {
         synchronized (ourNativeLock) {
             infos = readEncryptionInfosNative(book);
         }
-        return infos != null ? Arrays.<FileEncryptionInfo> asList(infos) : Collections.<FileEncryptionInfo> emptyList();
+        return infos != null ? Arrays.<FileEncryptionInfo>asList(infos) : Collections.<FileEncryptionInfo>emptyList();
     }
 
     private native FileEncryptionInfo[] readEncryptionInfosNative(AbstractBook book);
@@ -104,6 +108,7 @@ public class NativeFormatPlugin extends BuiltinFormatPlugin {
     synchronized public void readModel(BookModel model) throws BookReadingException {
         final int code;
         final String tempDirectory = SystemInfo.tempDirectory();
+        Logger.e("这里是具体的解析----------------jni 的解析方式"+model.toString()+"---------"+tempDirectory);
         synchronized (ourNativeLock) {
             code = readModelNative(model, tempDirectory);
         }

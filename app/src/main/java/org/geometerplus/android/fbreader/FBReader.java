@@ -105,7 +105,6 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
 
     private Intent myOpenBookIntent = null;
 
-    private final FBReaderApp.Notifier myNotifier = new AppNotifier(this);
 
     private static final String PLUGIN_ACTION_PREFIX = "___";
     private final List<PluginApi.ActionInfo> myPluginActions = new LinkedList<PluginApi.ActionInfo>();
@@ -163,7 +162,7 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
         }
         Config.Instance().runOnConnect(new Runnable() {
             public void run() {
-                myFBReaderApp.openBook(myBook, bookmark, action, myNotifier);
+                myFBReaderApp.openBook(myBook, bookmark, action);
                 AndroidFontUtil.clearFontCache();
             }
         });
@@ -207,7 +206,7 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
 
-        bindService(new Intent(this, DataService.class), DataConnection, DataService.BIND_AUTO_CREATE);
+//        bindService(new Intent(this, DataService.class), DataConnection, DataService.BIND_AUTO_CREATE);
 
         final Config config = Config.Instance();
         //ConfigShadow
@@ -260,6 +259,10 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
             //长按文本，显示的文本框
             new SelectionPopup(myFBReaderApp);
         }
+        if (myFBReaderApp.getPopupById(SettingPopup.ID) == null) {
+            new SettingPopup(myFBReaderApp);
+        }
+
 
         //操作action
         myFBReaderApp.addAction(ActionCode.SHOW_PREFERENCES, new ShowPreferencesAction(this, myFBReaderApp));
@@ -277,9 +280,6 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
         myFBReaderApp.addAction(ActionCode.SELECTION_SHARE, new SelectionShareAction(this, myFBReaderApp));
         myFBReaderApp.addAction(ActionCode.SELECTION_BOOKMARK, new SelectionBookmarkAction(this, myFBReaderApp));
 
-        myFBReaderApp.addAction(ActionCode.DISPLAY_BOOK_POPUP, new DisplayBookPopupAction(this, myFBReaderApp));
-        myFBReaderApp.addAction(ActionCode.PROCESS_HYPERLINK, new ProcessHyperlinkAction(this, myFBReaderApp));
-//        myFBReaderApp.addAction(ActionCode.OPEN_VIDEO, new OpenVideoAction(this, myFBReaderApp));
 
         myFBReaderApp.addAction(ActionCode.SHOW_CANCEL_MENU, new ShowCancelMenuAction(this, myFBReaderApp));
         myFBReaderApp.addAction(ActionCode.OPEN_START_SCREEN, new StartScreenAction(this, myFBReaderApp));
@@ -299,7 +299,7 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
 
         myFBReaderApp.addAction(ActionCode.SWITCH_TO_DAY_PROFILE, new SwitchProfileAction(this, myFBReaderApp, ColorProfile.DAY));
         myFBReaderApp.addAction(ActionCode.SWITCH_TO_NIGHT_PROFILE, new SwitchProfileAction(this, myFBReaderApp, ColorProfile.NIGHT));
-
+        new OpenPhotoAction(this,myFBReaderApp,myRootView);
         final Intent intent = getIntent();
         final String action = intent.getAction();
 
@@ -310,7 +310,7 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
                 myOpenBookIntent = null;
                 getCollection().bindToService(this, new Runnable() {
                     public void run() {
-                        myFBReaderApp.openBook(null, null, null, myNotifier);
+                        myFBReaderApp.openBook(null, null, null);
                     }
                 });
             }
@@ -436,7 +436,7 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
                     if (collection.sameBook(b, book)) {
                         b = collection.getRecentBook(1);
                     }
-                    myFBReaderApp.openBook(b, null, null, myNotifier);
+                    myFBReaderApp.openBook(b, null, null);
                 }
             });
         }else {
@@ -481,6 +481,7 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
         ((PopupPanel)myFBReaderApp.getPopupById(TextSearchPopup.ID)).setPanelInfo(this, myRootView);
         ((NavigationPopup)myFBReaderApp.getPopupById(NavigationPopup.ID)).setPanelInfo(this, myRootView);
         ((PopupPanel)myFBReaderApp.getPopupById(SelectionPopup.ID)).setPanelInfo(this, myRootView);
+        ((SettingPopup) myFBReaderApp.getPopupById(SettingPopup.ID)).setPanelInfo(this, myRootView);
     }
 
     @Override
@@ -559,22 +560,16 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
                     openBook(intent, null, true);
                 }
             });
-        }else if (myFBReaderApp.getCurrentServerBook(null) != null) {
-            getCollection().bindToService(this, new Runnable() {
-                public void run() {
-                    myFBReaderApp.useSyncInfo(true, myNotifier);
-                }
-            });
         }else if (myFBReaderApp.Model == null && myFBReaderApp.ExternalBook != null) {
             getCollection().bindToService(this, new Runnable() {
                 public void run() {
-                    myFBReaderApp.openBook(myFBReaderApp.ExternalBook, null, null, myNotifier);
+                    myFBReaderApp.openBook(myFBReaderApp.ExternalBook, null, null);
                 }
             });
         }else {
             getCollection().bindToService(this, new Runnable() {
                 public void run() {
-                    myFBReaderApp.useSyncInfo(true, myNotifier);
+                    myFBReaderApp.useSyncInfo(true);
                 }
             });
         }
@@ -618,7 +613,7 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
     @Override
     protected void onDestroy() {
         getCollection().unbind();
-        unbindService(DataConnection);
+//        unbindService(DataConnection);
         super.onDestroy();
     }
 
@@ -701,21 +696,6 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
 
     private void runCancelAction(Intent intent) {
         finish();
-//        final CancelMenuHelper.ActionType type;
-//        try {
-//            type = CancelMenuHelper.ActionType.valueOf(intent.getStringExtra(FBReaderIntents.Key.TYPE));
-//        }catch (Exception e) {
-//            // invalid (or null) type value
-//            return;
-//        }
-//        Bookmark bookmark = null;
-//        if (type == CancelMenuHelper.ActionType.returnTo) {
-//            bookmark = FBReaderIntents.getBookmarkExtra(intent);
-//            if (bookmark == null) {
-//                return;
-//            }
-//        }
-//        myFBReaderApp.runCancelAction(type, bookmark);
     }
 
     public void navigate() {
@@ -803,7 +783,7 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
             public void run() {
                 final Book recent = collection.getRecentBook(0);
                 if (recent != null && !collection.sameBook(recent, book)) {
-                    myFBReaderApp.openBook(recent, null, null, null);
+                    myFBReaderApp.openBook(recent, null, null);
                 }else {
                     myFBReaderApp.openHelpBook();
                 }
@@ -1019,7 +999,7 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
 
     private BroadcastReceiver mySyncUpdateReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
-            myFBReaderApp.useSyncInfo(myResumeTimestamp + 10 * 1000 > System.currentTimeMillis(), myNotifier);
+            myFBReaderApp.useSyncInfo(myResumeTimestamp + 10 * 1000 > System.currentTimeMillis());
         }
     };
 
@@ -1031,6 +1011,9 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
     public void hideOutline() {
         myFBReaderApp.getTextView().hideOutline();
         myFBReaderApp.getViewWidget().repaint();
+    }
+    public void setting() {
+        ((SettingPopup) myFBReaderApp.getPopupById(SettingPopup.ID)).runNavigation();
     }
 
 }

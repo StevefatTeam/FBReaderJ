@@ -39,7 +39,7 @@
 
 static const std::string ANY = "*";
 static const std::string EMPTY = "";
-static const XHTMLTagInfoList EMPTY_INFO_LIST;
+static XHTMLTagInfoList EMPTY_INFO_LIST;
 
 std::map<std::string,XHTMLTagAction*> XHTMLReader::ourTagActions;
 std::map<shared_ptr<XHTMLReader::FullNamePredicate>,XHTMLTagAction*> XHTMLReader::ourNsTagActions;

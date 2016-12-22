@@ -26,6 +26,7 @@ import org.geometerplus.zlibrary.core.util.ZLColor;
 import org.geometerplus.zlibrary.core.view.Hull;
 import org.geometerplus.zlibrary.core.view.SelectionCursor;
 import org.geometerplus.zlibrary.core.view.ZLPaintContext;
+import org.geometerplus.zlibrary.core.view.ZLViewEnums;
 import org.geometerplus.zlibrary.text.hyphenation.ZLTextHyphenationInfo;
 import org.geometerplus.zlibrary.text.hyphenation.ZLTextHyphenator;
 import org.geometerplus.zlibrary.text.model.ZLTextAlignmentType;
@@ -33,6 +34,7 @@ import org.geometerplus.zlibrary.text.model.ZLTextMark;
 import org.geometerplus.zlibrary.text.model.ZLTextModel;
 import org.geometerplus.zlibrary.text.model.ZLTextParagraph;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -1727,4 +1729,40 @@ public abstract class ZLTextView extends ZLTextViewBase {
     }
 
     protected abstract ExtensionElementManager getExtensionManager();
+
+    /****************************一下是后来添加的数据**********************************/
+    public final synchronized void gotoPageByPec(int pec) {
+        if (myModel == null || myModel.getParagraphsNumber() == 0) {
+            return;
+        }
+
+        gotoPositionByEnd(pec, 0, 0);
+    }
+    public final synchronized String pagePositionPec() {
+        int current = getCurrentCharNumber(PageIndex.current, false);
+        int total = sizeOfFullText();
+
+        if (getCurrentCharNumber(ZLViewEnums.PageIndex.current, true) == 0) {
+            return "0.00%";
+        }
+
+        if (computeTextPageNumber(total) <= 3) {
+            current = myCurrentPage.EndCursor.getParagraphIndex();
+            total = myModel.getParagraphsNumber() - 1;
+        }
+
+        final StringBuilder info = new StringBuilder();
+        float size = (float) current * 100 / total;
+        DecimalFormat df = new DecimalFormat("0.00");
+        info.append(df.format(size));
+        info.append("%");
+        return info.toString();
+    }
+    public final synchronized int pagePosition1() {
+        return myCurrentPage == null ? 0 : myCurrentPage.EndCursor.getParagraphIndex();
+    }
+
+    public final synchronized int pagePosition2() {
+        return myModel == null ? 0 : myModel.getParagraphsNumber() - 1;
+    }
 }

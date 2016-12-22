@@ -19,6 +19,8 @@
 
 package org.geometerplus.fbreader.bookmodel;
 
+import com.orhanobut.logger.Logger;
+
 import org.geometerplus.fbreader.book.Book;
 import org.geometerplus.fbreader.formats.BookReadingException;
 import org.geometerplus.fbreader.formats.BuiltinFormatPlugin;
@@ -41,6 +43,7 @@ public final class BookModel {
         if (plugin instanceof BuiltinFormatPlugin) {
             final BookModel model = new BookModel(book);
             ((BuiltinFormatPlugin)plugin).readModel(model);
+            Logger.e("这里已经解析完毕，但是不知道是走的那个解析*********************"+plugin.toString());
             return model;
         }
 

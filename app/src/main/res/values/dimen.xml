@@ -10,4 +10,14 @@
     <dimen name="buttontoast_hover">24dp</dimen>
     <dimen name="buttontoast_x_padding">12dp</dimen>
     <dimen name="cardtoast_margin">4dp</dimen>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="card_margin">5dp</dimen>
+    <dimen name="btn_fab_size">56dp</dimen>
+    <dimen name="btn_fab_margin">16dp</dimen>
+
+    <dimen name="corner_radius">2dp</dimen>
+    <dimen name="layer_padding">3dp</dimen>
 </resources>

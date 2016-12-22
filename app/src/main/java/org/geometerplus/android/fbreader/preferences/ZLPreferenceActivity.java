@@ -27,7 +27,6 @@ import android.preference.PreferenceScreen;
 import org.geometerplus.android.util.OrientationUtil;
 import org.geometerplus.zlibrary.core.options.*;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
-import org.geometerplus.zlibrary.ui.android.network.SQLiteCookieDatabase;
 
 import java.util.HashMap;
 
@@ -124,7 +123,6 @@ abstract class ZLPreferenceActivity extends android.preference.PreferenceActivit
 
         Thread.setDefaultUncaughtExceptionHandler(new org.geometerplus.zlibrary.ui.android.library.UncaughtExceptionHandler(this));
 
-        SQLiteCookieDatabase.init(this);
 
         myScreen = getPreferenceManager().createPreferenceScreen(this);
 

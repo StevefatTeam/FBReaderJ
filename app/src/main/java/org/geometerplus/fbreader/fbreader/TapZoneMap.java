@@ -19,6 +19,8 @@
 
 package org.geometerplus.fbreader.fbreader;
 
+import com.orhanobut.logger.Logger;
+
 import org.geometerplus.zlibrary.core.filesystem.ZLFile;
 import org.geometerplus.zlibrary.core.options.ZLIntegerRangeOption;
 import org.geometerplus.zlibrary.core.options.ZLStringListOption;
@@ -125,15 +127,18 @@ public class TapZoneMap {
     }
 
     public String getActionByCoordinates(int x, int y, int width, int height, Tap tap) {
+        Logger.e("这是抓屏幕的范围，显示菜单的----------x:"+x+" y："+y);
         if (width == 0 || height == 0) {
             return null;
         }
         x = Math.max(0, Math.min(width - 1, x));
         y = Math.max(0, Math.min(height - 1, y));
+        Logger.e("坐标位置----------w:"+myWidth.getValue() * x / width+"----------h："+myHeight.getValue() * y / height);
         return getActionByZone(myWidth.getValue() * x / width, myHeight.getValue() * y / height, tap);
     }
 
     public String getActionByZone(int h, int v, Tap tap) {
+
         final ZLStringOption option = getOptionByZone(new Zone(h, v), tap);
         return option != null ? option.getValue() : null;
     }

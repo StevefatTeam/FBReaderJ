@@ -22,7 +22,6 @@ package org.geometerplus.android.fbreader.sync;
 import org.fbreader.util.ComparisonUtil;
 import org.geometerplus.fbreader.book.*;
 import org.geometerplus.fbreader.fbreader.options.SyncOptions;
-import org.geometerplus.zlibrary.core.network.JsonRequest2;
 import org.geometerplus.zlibrary.core.util.ZLColor;
 
 import java.util.*;
@@ -35,7 +34,6 @@ class BookmarkSyncUtil {
             final Set<String> deletedOnServerUids = new HashSet<String>();
             final Map<Integer, Map<String, Object>> serverStyles = new HashMap<Integer, Map<String, Object>>();
 
-            JsonRequest2 infoRequest = null;
 
             // Step 0: loading bookmarks info lists (actual & deleted bookmark ids)
             final Map<String, Object> data = new HashMap<String, Object>();
@@ -46,12 +44,6 @@ class BookmarkSyncUtil {
             for (int pageNo = 0; ; ++pageNo) {
                 data.put("page_no", pageNo);
                 data.put("timestamp", System.currentTimeMillis());
-                infoRequest = new JsonRequest2(SyncOptions.BASE_URL + "sync/bookmarks.lite.paged", data) {
-                    @Override
-                    public void processResponse(Object response) {
-                        responseMap.putAll((Map<String, Object>)response);
-                    }
-                };
                 for (Map<String, Object> info : (List<Map<String, Object>>)responseMap.get("actual")) {
                     final Info bmk = new Info(info);
                     actualServerInfos.put(bmk.Uid, bmk);
@@ -252,12 +244,6 @@ class BookmarkSyncUtil {
                 allDataToSend.put("requests", requests);
                 allDataToSend.put("timestamp", System.currentTimeMillis());
                 allDataToSend.put("styles", stylesToSend);
-                final JsonRequest2 serverUpdateRequest = new JsonRequest2(SyncOptions.BASE_URL + "sync/update.bookmarks", allDataToSend) {
-                    @Override
-                    public void processResponse(Object response) {
-                        System.err.println("BMK UPDATED: " + response);
-                    }
-                };
             }
         }catch (Throwable t) {
             t.printStackTrace();

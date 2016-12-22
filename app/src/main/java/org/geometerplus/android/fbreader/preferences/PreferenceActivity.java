@@ -31,7 +31,6 @@ import org.geometerplus.fbreader.fbreader.ActionCode;
 import org.geometerplus.fbreader.fbreader.FBReaderApp;
 import org.geometerplus.fbreader.fbreader.FBView;
 import org.geometerplus.fbreader.fbreader.options.*;
-import org.geometerplus.fbreader.network.sync.SyncData;
 import org.geometerplus.zlibrary.core.application.ZLKeyBindings;
 import org.geometerplus.zlibrary.core.language.Language;
 import org.geometerplus.zlibrary.core.options.Config;

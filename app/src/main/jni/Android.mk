@@ -1,6 +1,7 @@
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
+LOCAL_LDLIBS :=-llog
 
 LOCAL_MODULE                  := DeflatingDecompressor-v3
 LOCAL_SRC_FILES               := DeflatingDecompressor/DeflatingDecompressor.cpp
@@ -9,6 +10,7 @@ LOCAL_LDLIBS                  := -lz
 include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
+LOCAL_LDLIBS :=-llog
 
 LOCAL_MODULE                  := LineBreak-v2
 LOCAL_SRC_FILES               := LineBreak/LineBreaker.cpp LineBreak/liblinebreak-2.0/linebreak.c LineBreak/liblinebreak-2.0/linebreakdata.c LineBreak/liblinebreak-2.0/linebreakdef.c
@@ -16,6 +18,7 @@ LOCAL_SRC_FILES               := LineBreak/LineBreaker.cpp LineBreak/liblinebrea
 include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
+LOCAL_LDLIBS :=-llog
 
 EXPAT_DIR                     := expat-2.0.1
 
@@ -28,6 +31,7 @@ LOCAL_EXPORT_C_INCLUDES       := $(LOCAL_PATH)/$(EXPAT_DIR)/lib
 include $(BUILD_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
+LOCAL_LDLIBS :=-llog
 
 LOCAL_MODULE                  := NativeFormats-v4
 LOCAL_CFLAGS                  := -Wall

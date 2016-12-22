@@ -19,6 +19,8 @@
 
 package org.geometerplus.fbreader.formats.oeb;
 
+import com.orhanobut.logger.Logger;
+
 import org.geometerplus.fbreader.book.AbstractBook;
 import org.geometerplus.fbreader.book.BookUtil;
 import org.geometerplus.fbreader.bookmodel.BookModel;
@@ -44,6 +46,7 @@ public class OEBNativePlugin extends NativeFormatPlugin {
         file.setCached(true);
         try {
             super.readModel(model);
+            Logger.e("走这里的解析了。。。。。");
             model.setLabelResolver(new BookModel.LabelResolver() {
                 public List<String> getCandidates(String id) {
                     final int index = id.indexOf("#");

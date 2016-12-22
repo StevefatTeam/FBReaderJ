@@ -19,6 +19,8 @@
 
 package org.geometerplus.android.fbreader;
 
+import com.orhanobut.logger.Logger;
+
 import org.geometerplus.fbreader.fbreader.FBReaderApp;
 
 class ShowMenuAction extends FBAndroidAction {
@@ -29,6 +31,7 @@ class ShowMenuAction extends FBAndroidAction {
 
     @Override
     protected void run(Object... params) {
+        Logger.e("这个是显示menu 的东西");
         BaseActivity.openOptionsMenu();
     }
 }

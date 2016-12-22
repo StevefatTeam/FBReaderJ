@@ -20,6 +20,7 @@
 #include <ZLStringUtil.h>
 #include <ZLFile.h>
 #include <ZLInputStream.h>
+#include <Android/log.h>
 
 #include "HtmlPlugin.h"
 #include "HtmlDescriptionReader.h"
@@ -29,6 +30,9 @@
 #include "../util/MiscUtil.h"
 #include "../../library/Book.h"
 #include "../../bookmodel/BookModel.h"
+
+#define TAG "HtmlPlugin.cpp"
+#define LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,TAG,__VA_ARGS__)
 
 const std::string HtmlPlugin::supportedFileType() const {
 	return "HTML";
@@ -57,11 +61,12 @@ bool HtmlPlugin::readUids(Book &/*book*/) const {
 bool HtmlPlugin::readModel(BookModel &model) const {
 	const Book& book = *model.book();
 	const ZLFile &file = book.file();
+	LOGD("这是html 的解析-----");
 	shared_ptr<ZLInputStream> stream = file.inputStream();
 	if (stream.isNull()) {
 		return false;
 	}
-
+	//这里解析数据-----------------------------html的数据
 	PlainTextFormat format(file);
 	if (!format.initialized()) {
 		PlainTextFormatDetector detector;

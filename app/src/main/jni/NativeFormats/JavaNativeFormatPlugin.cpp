@@ -21,6 +21,7 @@
 #include <JniEnvelope.h>
 #include <ZLFileImage.h>
 #include <FileEncryptionInfo.h>
+#include<Android/log.h>
 
 #include "fbreader/src/bookmodel/BookModel.h"
 #include "fbreader/src/formats/FormatPlugin.h"
@@ -28,6 +29,11 @@
 #include "fbreader/src/library/Book.h"
 #include "fbreader/src/library/Tag.h"
 #include "fbreader/src/library/UID.h"
+
+
+#define TAG    "javaNativeFormatPlugin" // 这个是自定义的LOG的标识
+#define LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,TAG,__VA_ARGS__) // 定义LOGD类型
+
 
 static shared_ptr<FormatPlugin> findCppPlugin(jobject base) {
 	const std::string fileType = AndroidUtil::Method_NativeFormatPlugin_supportedFileType->callForCppString(base);
