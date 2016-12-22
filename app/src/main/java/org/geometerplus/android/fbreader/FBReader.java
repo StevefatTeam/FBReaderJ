@@ -28,6 +28,8 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.view.*;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
+
 import org.geometerplus.android.fbreader.api.*;
 import org.geometerplus.android.fbreader.formatPlugin.PluginUtil;
 import org.geometerplus.android.fbreader.httpd.DataService;
@@ -60,6 +62,7 @@ import org.geometerplus.zlibrary.ui.android.error.ErrorKeys;
 import org.geometerplus.zlibrary.ui.android.library.ZLAndroidApplication;
 import org.geometerplus.zlibrary.ui.android.library.ZLAndroidLibrary;
 import org.geometerplus.zlibrary.ui.android.view.AndroidFontUtil;
+import org.geometerplus.zlibrary.ui.android.view.ZLAndroidCurlWidget;
 import org.geometerplus.zlibrary.ui.android.view.ZLAndroidWidget;
 
 import java.io.PrintWriter;
@@ -93,6 +96,7 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
      * 翻页组件
      */
     private ZLAndroidWidget myMainView;
+    private ZLAndroidCurlWidget myCurlView;
 
     private volatile boolean myShowStatusBarFlag;
     private String myMenuLanguage;
@@ -927,6 +931,21 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
         return myMainView;
     }
 
+    @Override
+    public void hideViewWidget(boolean flag) {
+        if (myCurlView != null && myMainView != null) {
+            if (flag) {
+                myCurlView.setVisibility(View.VISIBLE);
+                myMainView.setVisibility(View.GONE);
+            } else {
+                myCurlView.setVisibility(View.GONE);
+                myMainView.setVisibility(View.VISIBLE);
+            }
+        } else {
+            Toast.makeText(this, "view 切换错误", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private final HashMap<MenuItem, String> myMenuItemMap = new HashMap<MenuItem, String>();
 
     private final MenuItem.OnMenuItemClickListener myMenuListener = new MenuItem.OnMenuItemClickListener() {
@@ -988,14 +1007,14 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
         }
     }
 
-    @Override
-    public void setWindowTitle(final String title) {
-        runOnUiThread(new Runnable() {
-            public void run() {
-                setTitle(title);
-            }
-        });
-    }
+//    @Override
+//    public void setWindowTitle(final String title) {
+//        runOnUiThread(new Runnable() {
+//            public void run() {
+//                setTitle(title);
+//            }
+//        });
+//    }
 
     private BroadcastReceiver mySyncUpdateReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {

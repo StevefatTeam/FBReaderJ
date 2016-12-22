@@ -27,7 +27,6 @@ import org.geometerplus.zlibrary.core.view.ZLViewWidget;
 import java.util.*;
 
 public abstract class ZLApplication {
-
     public static ZLApplication Instance() {
         return ourInstance;
     }
@@ -68,30 +67,35 @@ public abstract class ZLApplication {
         myWindow = window;
     }
 
+    public ZLApplicationWindow getMyWindow(){
+        return myWindow;
+    }
+
     public final void initWindow() {
         setView(myView);
     }
 
-    protected void setTitle(String title) {
-        if (myWindow != null) {
-            myWindow.setWindowTitle(title);
-        }
-    }
+//    protected void setTitle(String title) {
+//        if (myWindow != null) {
+//            myWindow.setWindowTitle(title);
+//        }
+//    }
 
     protected void showErrorMessage(String resourceKey) {
+
         if (myWindow != null) {
             myWindow.showErrorMessage(resourceKey);
         }
     }
 
     protected void showErrorMessage(String resourceKey, String parameter) {
+
         if (myWindow != null) {
             myWindow.showErrorMessage(resourceKey, parameter);
         }
     }
 
     public interface SynchronousExecutor {
-
         void execute(Runnable action, Runnable uiPostAction);
 
         void executeAux(String key, Runnable action);
@@ -110,7 +114,7 @@ public abstract class ZLApplication {
     protected SynchronousExecutor createExecutor(String key) {
         if (myWindow != null) {
             return myWindow.createExecutor(key);
-        }else {
+        } else {
             return myDummyExecutor;
         }
     }
@@ -175,7 +179,7 @@ public abstract class ZLApplication {
     public final void runAction(String actionId, Object... params) {
         final ZLAction action = myIdToActionMap.get(actionId);
         if (action != null) {
-            action.checkAndRun(params);
+            action.checkAndRun(params); //y 检查是否可用后运行
         }
     }
 
@@ -192,6 +196,7 @@ public abstract class ZLApplication {
     }
 
     public boolean closeWindow() {
+
         onWindowClosing();
         if (myWindow != null) {
             myWindow.close();
@@ -204,7 +209,6 @@ public abstract class ZLApplication {
 
     //Action
     static abstract public class ZLAction {
-
         public boolean isVisible() {
             return true;
         }
@@ -217,6 +221,7 @@ public abstract class ZLApplication {
             return Boolean3.UNDEFINED;
         }
 
+        //y 功能运行
         public final boolean checkAndRun(Object... params) {
             if (isEnabled()) {
                 run(params);
@@ -229,7 +234,6 @@ public abstract class ZLApplication {
     }
 
     public static abstract class PopupPanel {
-
         protected final ZLApplication Application;
 
         protected PopupPanel(ZLApplication application) {
@@ -270,7 +274,6 @@ public abstract class ZLApplication {
     private final HashMap<Runnable, TimerTask> myTimerTasks = new HashMap<Runnable, TimerTask>();
 
     private static class MyTimerTask extends TimerTask {
-
         private final Runnable myRunnable;
 
         MyTimerTask(Runnable runnable) {
@@ -284,6 +287,7 @@ public abstract class ZLApplication {
     }
 
     private void addTimerTaskInternal(Runnable runnable, long periodMilliseconds) {
+
         final TimerTask task = new MyTimerTask(runnable);
         myTimer.schedule(task, periodMilliseconds / 2, periodMilliseconds);
         myTimerTasks.put(runnable, task);

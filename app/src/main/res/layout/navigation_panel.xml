@@ -23,8 +23,8 @@
         android:ellipsize="end"
         android:paddingBottom="3dp"
         android:paddingTop="3dp"
-        android:singleLine="true"
-        android:text="32% dsfdsfcbcisdycs"
+        android:lines="1"
+        android:text="32% 不知名的书籍"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#ddd"
         android:textSize="16dp" />

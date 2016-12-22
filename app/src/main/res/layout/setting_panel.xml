@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <org.geometerplus.android.fbreader.SettingWindow
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/setting_panel"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -188,43 +189,40 @@
         android:layout_marginRight="8dp"
         android:padding="10dp">
 
-        <TextView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/bg_white"
             android:layout_width="0dp"
             android:layout_height="36dp"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_weight="1"
-            android:background="@drawable/bg_white"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp" />
+            android:src="@drawable/bg_white"
+            app:civ_border_width="2dp"
+            app:civ_border_color="#FF000000"/>
 
-        <TextView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/bg_grey"
             android:layout_width="0dp"
             android:layout_height="36dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="18dp"
             android:layout_weight="1"
-            android:background="@drawable/bg_grey"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp" />
+            android:src="@drawable/bg_grey"
+            app:civ_border_width="2dp"
+            app:civ_border_color="#FF000000" />
 
-        <TextView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/bg_vine_grey"
             android:layout_width="0dp"
             android:layout_height="36dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="18dp"
             android:layout_weight="1"
-            android:background="@drawable/bg_vine_grey"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp" />
+            android:src="@drawable/bg_vine_grey"
+            app:civ_border_width="2dp"
+            app:civ_border_color="#FF000000" />
 
-        <TextView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/bg_vine_white"
             android:layout_width="0dp"
             android:layout_height="36dp"
@@ -232,12 +230,11 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="18dp"
             android:layout_weight="1"
-            android:background="@drawable/bg_vine_white"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp" />
+            android:src="@drawable/bg_vine_white"
+            app:civ_border_width="2dp"
+            app:civ_border_color="#FF000000" />
 
-        <TextView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/bg_green"
             android:layout_width="0dp"
             android:layout_height="36dp"
@@ -245,12 +242,11 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="18dp"
             android:layout_weight="1"
-            android:background="@drawable/bg_green"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp" />
+            android:src="@drawable/bg_green"
+            app:civ_border_width="2dp"
+            app:civ_border_color="#FF000000" />
 
-        <TextView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/bg_night"
             android:layout_width="0dp"
             android:layout_height="36dp"
@@ -258,10 +254,9 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="18dp"
             android:layout_weight="1"
-            android:background="@drawable/bg_night"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp" />
+            android:src="@drawable/bg_night"
+            app:civ_border_width="2dp"
+            app:civ_border_color="#FF000000" />
     </LinearLayout>
 
 

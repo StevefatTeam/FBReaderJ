@@ -1,29 +1,11 @@
 <resources>
 
-    <style name="FBReader.Activity" parent="android:Theme"></style>
+    <style name="FBReader.Activity" parent="Theme.AppCompat"></style>
 
-    <style name="FBReader.Activity.NoActionBar" parent="android:Theme"></style>
+    <style name="FBReader.Activity.NoActionBar" parent="Theme.AppCompat.NoActionBar"></style>
 
-    <style name="FBReader.Dialog" parent="android:Theme.Dialog"></style>
+    <style name="FBReader.Dialog" parent="Theme.AppCompat.Light.Dialog"></style>
 
-    <color name="transparent">#00000000</color>
-
-    <style name="FBReader.Transparent" parent="android:Theme.Translucent.NoTitleBar">
-        <item name="android:windowBackground">@color/transparent</item>
-    </style>
-
-
-
-    <style name="DefaultText">
-        <item name="android:text">Default</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:drawablePadding">4dp</item>
-        <item name="android:paddingTop">8dp</item>
-        <item name="android:paddingBottom">8dp</item>
-        <item name="android:paddingLeft">16dp</item>
-        <item name="android:paddingRight">16dp</item>
-    </style>
 
     <style name="DefaultRootLayout">
         <item name="android:background">@drawable/background_standard_gray</item>

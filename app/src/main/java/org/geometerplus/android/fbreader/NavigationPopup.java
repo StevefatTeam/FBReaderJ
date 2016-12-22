@@ -118,11 +118,15 @@ final class NavigationPopup extends ZLApplication.PopupPanel {
         } else {
             view.gotoPage(page);
         }
-//        myKooReader.clearTextCaches();
         myFBReader.getViewWidget().reset();
         myFBReader.getViewWidget().repaint();
     }
 
+    /**
+     * 创建底部的设置菜单
+     * @param activity    需要创建的activity
+     * @param root  布局
+     */
     private void createPanel(FBReader activity, RelativeLayout root) {
         if (myWindow != null && activity == myWindow.getContext()) {
             return;
@@ -192,7 +196,6 @@ final class NavigationPopup extends ZLApplication.PopupPanel {
         next_character.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                textView.getModel().getParagraphsNumber();
                 gotoPage(pagePosition.Current + 30);
             }
         });
@@ -210,11 +213,7 @@ final class NavigationPopup extends ZLApplication.PopupPanel {
 
             private void gotoPagePer(int page) {
                 final ZLTextView view = myFBReader.getTextView();
-//                if (page == 0) {
-//                    view.gotoHome();
-//                } else {
                 view.gotoPageByPec(page);
-//                }
             }
 
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -226,26 +225,18 @@ final class NavigationPopup extends ZLApplication.PopupPanel {
                 myFBReader.getViewWidget().repaint();
                 myIsInProgress = false;
                 //y 松手直接进行跳转
-//                final ZLTextWordCursor position = myStartPosition; // 返回到起始位置
                 if (myStartPosition != null &&
                         !myStartPosition.equals(myFBReader.getTextView().getStartCursor())) {
                     myFBReader.addInvisibleBookmark(myStartPosition);
                     myFBReader.storePosition();
                 }
                 myStartPosition = null;
-//                myKooReader.clearTextCaches();
-//                myKooReader.getViewWidget().reset();
-//                myKooReader.getViewWidget().repaint();
             }
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
-//                    final int page = progress + 1;
-//                    final int pagesNumber = seekBar.getMax() + 1;
-//                    gotoPage(page);
                     gotoPagePer(progress);
                     text.setText(makeProgressTextPer(myFBReader.getTextView().pagePositionPec()));
-//                    text.setText(makeProgressText(page, pagesNumber));
                 }
             }
         });
@@ -260,36 +251,12 @@ final class NavigationPopup extends ZLApplication.PopupPanel {
 
         String progress = textView.pagePositionPec();
 
-//        if (slider.getMax() != pagePosition.Total - 1 || slider.getProgress() != pagePosition.Current - 1) {
-//            slider.setMax(pagePosition.Total - 1);
-//            slider.setProgress(pagePosition.Current - 1);
         slider.setMax(textView.pagePosition2());
         slider.setProgress(textView.pagePosition1());
         text.setText(makeProgressTextPer(progress));
-//            text.setText(makeProgressText(pagePosition.Current, pagePosition.Total));
-//    }
 
     }
 
-    private String makeProgressText(int page, int pagesNumber) {
-        final StringBuilder builder = new StringBuilder();
-        builder.append(page);
-        builder.append("/");
-        builder.append(pagesNumber);
-        final TOCTree tocElement = myFBReader.getCurrentTOCElement();
-        if (tocElement != null) {
-            builder.append("  ");
-            builder.append(tocElement.getText());
-        }
-
-        if (myFBReader.ViewOptions.ColorProfileName.getValue().equals(ColorProfile.DAY)) {
-            dark.setVisibility(View.VISIBLE);
-        } else {
-            light.setVisibility(View.VISIBLE);
-        }
-
-        return builder.toString();
-    }
 
     private String makeProgressTextPer(String progress) {
         final StringBuilder builder = new StringBuilder();

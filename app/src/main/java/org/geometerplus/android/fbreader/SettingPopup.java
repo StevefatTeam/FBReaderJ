@@ -17,6 +17,8 @@ import org.geometerplus.zlibrary.core.options.ZLIntegerRangeOption;
 import org.geometerplus.zlibrary.core.view.ZLView;
 import org.geometerplus.zlibrary.ui.android.R;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 
 final class SettingPopup extends ZLApplication.PopupPanel implements View.OnClickListener {
     final static String ID = "SettingPopup";
@@ -33,7 +35,7 @@ final class SettingPopup extends ZLApplication.PopupPanel implements View.OnClic
     private SeekBar slider;
     private TextView tvPageMode, tvSetting;
     private TextView tvPageSimulation, tvPageCover, tvPageSlide, tvPageNone;
-    private TextView bgWhite, bgGrey, bgVineGrey, bgVineWhite, bgGreen, bgNight;
+    private CircleImageView bgWhite, bgGrey, bgVineGrey, bgVineWhite, bgGreen, bgNight;
     private TextView tvAlignLeft, tvAlignRight, tvAlignCenter, tvAlign;
     private boolean pageMode;
 
@@ -114,12 +116,12 @@ final class SettingPopup extends ZLApplication.PopupPanel implements View.OnClic
         tvPageCover = (TextView) myWindow.findViewById(R.id.tv_page_cover);
         tvPageSlide = (TextView) myWindow.findViewById(R.id.tv_page_slide);
         tvPageNone = (TextView) myWindow.findViewById(R.id.tv_page_none);
-        bgWhite = (TextView) myWindow.findViewById(R.id.bg_white);
-        bgGrey = (TextView) myWindow.findViewById(R.id.bg_grey);
-        bgVineGrey = (TextView) myWindow.findViewById(R.id.bg_vine_grey);
-        bgVineWhite = (TextView) myWindow.findViewById(R.id.bg_vine_white);
-        bgGreen = (TextView) myWindow.findViewById(R.id.bg_green);
-        bgNight = (TextView) myWindow.findViewById(R.id.bg_night);
+        bgWhite = (CircleImageView) myWindow.findViewById(R.id.bg_white);
+        bgGrey = (CircleImageView) myWindow.findViewById(R.id.bg_grey);
+        bgVineGrey = (CircleImageView) myWindow.findViewById(R.id.bg_vine_grey);
+        bgVineWhite = (CircleImageView) myWindow.findViewById(R.id.bg_vine_white);
+        bgGreen = (CircleImageView) myWindow.findViewById(R.id.bg_green);
+        bgNight = (CircleImageView) myWindow.findViewById(R.id.bg_night);
         tvAlignLeft = (TextView) myWindow.findViewById(R.id.tv_align_left);
         tvAlignRight = (TextView) myWindow.findViewById(R.id.tv_align_right);
         tvAlignCenter = (TextView) myWindow.findViewById(R.id.tv_align_center);

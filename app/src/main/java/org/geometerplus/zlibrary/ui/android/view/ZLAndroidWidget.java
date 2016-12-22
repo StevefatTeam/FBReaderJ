@@ -29,6 +29,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import org.geometerplus.android.fbreader.FBReader;
+import org.geometerplus.android.fbreader.FBReaderMainActivity;
 import org.geometerplus.fbreader.Paths;
 import org.geometerplus.zlibrary.core.application.ZLApplication;
 import org.geometerplus.zlibrary.core.application.ZLKeyBindings;
@@ -40,22 +41,19 @@ import org.geometerplus.zlibrary.ui.android.view.animation.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * 阅读翻页
- */
-public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLongClickListener {
+public class ZLAndroidWidget extends View implements ZLViewWidget, View.OnLongClickListener {
+    protected Integer myColorLevel;
 
-    public final ExecutorService prepareService = Executors.newSingleThreadExecutor();
+    public final ExecutorService PrepareService = Executors.newSingleThreadExecutor();
 
     private final Paint myPaint = new Paint();
 
-    private final BitmapManagerImpl myBitmapManager = new BitmapManagerImpl(this);
-    private Bitmap myFooterBitmap;
+    private final BitmapManagerImpl myBitmapManager = new BitmapManagerImpl(this, getContext());
     private final SystemInfo mySystemInfo;
 
     public ZLAndroidWidget(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        mySystemInfo = Paths.systemInfo(context);
+        mySystemInfo = Paths.systemInfo(context); // 缓存相关
         init();
     }
 
@@ -82,8 +80,10 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+        // 新打开时调用
         getAnimationProvider().terminate();
         if (myScreenIsTouched) {
+            // 手指触摸屏幕,并旋转手机
             final ZLView view = ZLApplication.Instance().getCurrentView();
             myScreenIsTouched = false;
             view.onScrollingFinished(ZLView.PageIndex.current);
@@ -91,23 +91,21 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
     }
 
     @Override
-    protected void onDraw(final Canvas canvas) {
+    public void onDraw(final Canvas canvas) {
         final Context context = getContext();
         if (context instanceof FBReader) {
-            ((FBReader)context).createWakeLock();
-        }else {
-            System.err.println("A surprise: view's context is not an FBReader");
+            ((FBReader) context).createWakeLock();
+        } else {
+            System.err.println("A surprise: view's context is not an KooReader");
         }
-        super.onDraw(canvas);
 
-        //		final int w = getWidth();
-        //		final int h = getMainAreaHeight();
+        myBitmapManager.setSize(getWidth(), getHeight());
 
-        myBitmapManager.setSize(getWidth(), getMainAreaHeight());
         if (getAnimationProvider().inProgress()) {
-            onDrawInScrolling(canvas);
-        }else {
-            onDrawStatic(canvas);
+            onDrawInScrolling(canvas); // 翻页过程中调用
+        } else {
+
+            onDrawStatic(canvas); // 首次/页面跳转时调用,防止黑屏
             ZLApplication.Instance().onRepaintFinished();
         }
     }
@@ -125,6 +123,7 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
                     break;
                 case curl:
                     myAnimationProvider = new CurlAnimationProvider(myBitmapManager);
+//                    myAnimationProvider = new CurlPageProviderImpl(myBitmapManager);
                     break;
                 case slide:
                     myAnimationProvider = new SlideAnimationProvider(myBitmapManager);
@@ -137,28 +136,37 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
         return myAnimationProvider;
     }
 
+    public boolean isCurlAnimation(){
+        if(getAnimationProvider() instanceof CurlPageProviderImpl){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     private void onDrawInScrolling(Canvas canvas) {
         final ZLView view = ZLApplication.Instance().getCurrentView();
 
         final AnimationProvider animator = getAnimationProvider();
         final AnimationProvider.Mode oldMode = animator.getMode();
         animator.doStep();
-        if (animator.inProgress()) {
-            animator.draw(canvas);
-            if (animator.getMode().Auto) {
+        if (animator.inProgress()) { // 动画过程中执行
+            animator.draw(canvas); // 动画绘制
+            if (animator.getMode().Auto) { // 松手后完成后续绘制
                 postInvalidate();
             }
-            drawFooter(canvas, animator);
-        }else {
+        } else {                     // 动画结束后执行, 无动画情况只会调用这个
             switch (oldMode) {
-                case AnimatedScrollingForward: {
-                    final ZLView.PageIndex index = animator.getPageToScrollTo();
+                case AnimatedScrollingForward: { // 当翻到 下一页/上一页 时调用
+                    final ZLView.PageIndex index = animator.getPageToScrollTo(); // 得到翻页后的KooView 向左翻->next 向右翻->previous
+                    // 若为next     -> next->current,current->previous
+                    // 若为previous -> current->next,previous->current
                     myBitmapManager.shift(index == ZLView.PageIndex.next);
                     view.onScrollingFinished(index);
                     ZLApplication.Instance().onRepaintFinished();
                     break;
                 }
-                case AnimatedScrollingBackward:
+                case AnimatedScrollingBackward: // 没有翻到 下一页/上一页 则还在当前页
                     view.onScrollingFinished(ZLView.PageIndex.current);
                     break;
             }
@@ -176,19 +184,23 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
         postInvalidate();
     }
 
+    // onFingerPress
+    // 是否支持拖动翻页
+    // 开始翻页
     @Override
     public void startManualScrolling(int x, int y, ZLView.Direction direction) {
         final AnimationProvider animator = getAnimationProvider();
-        animator.setup(direction, getWidth(), getMainAreaHeight(), myColorLevel);
-        animator.startManualScrolling(x, y);
+        animator.setup(direction, getWidth(), getHeight(), myColorLevel);
+        animator.startManualScrolling(x, y); // PreManualScrolling 先pre 然后判断是ManualScrolling还是NoScrolling
     }
 
+    // onFingerMove
     @Override
     public void scrollManuallyTo(int x, int y) {
         final ZLView view = ZLApplication.Instance().getCurrentView();
         final AnimationProvider animator = getAnimationProvider();
-        if (view.canScroll(animator.getPageToScrollTo(x, y))) {
-            animator.scrollTo(x, y);
+        if (view.canScroll(animator.getPageToScrollTo(x, y))) { // 判断是否可以翻(是否有上/下一页)
+            animator.scrollTo(x, y); // 一直在改变Mode的状态
             postInvalidate();
         }
     }
@@ -200,7 +212,7 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
             return;
         }
         final AnimationProvider animator = getAnimationProvider();
-        animator.setup(direction, getWidth(), getMainAreaHeight(), myColorLevel);
+        animator.setup(direction, getWidth(), getHeight(), myColorLevel);
         animator.startAnimatedScrolling(pageIndex, x, y, speed);
         if (animator.getMode().Auto) {
             postInvalidate();
@@ -214,7 +226,7 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
             return;
         }
         final AnimationProvider animator = getAnimationProvider();
-        animator.setup(direction, getWidth(), getMainAreaHeight(), myColorLevel);
+        animator.setup(direction, getWidth(), getHeight(), myColorLevel);
         animator.startAnimatedScrolling(pageIndex, null, null, speed);
         if (animator.getMode().Auto) {
             postInvalidate();
@@ -222,7 +234,7 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
     }
 
     @Override
-    public void startAnimatedScrolling(int x, int y, int speed) {
+    public void startAnimatedScrolling(int x, int y, int speed) { // 翻页滑动
         final ZLView view = ZLApplication.Instance().getCurrentView();
         final AnimationProvider animator = getAnimationProvider();
         if (!view.canScroll(animator.getPageToScrollTo(x, y))) {
@@ -230,7 +242,7 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
             return;
         }
         animator.startAnimatedScrolling(x, y, speed);
-        postInvalidate();
+        postInvalidate(); // 更新视图
     }
 
     void drawOnBitmap(Bitmap bitmap, ZLView.PageIndex index) {
@@ -239,48 +251,36 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
             return;
         }
 
-        final ZLAndroidPaintContext context = new ZLAndroidPaintContext(mySystemInfo, new Canvas(bitmap), new ZLAndroidPaintContext.Geometry(getWidth(), getHeight(), getWidth(), getMainAreaHeight(), 0, 0), view.isScrollbarShown() ? getVerticalScrollbarWidth() : 0);
+        final ZLAndroidPaintContext context = new ZLAndroidPaintContext(
+                mySystemInfo,
+                new Canvas(bitmap),
+                new ZLAndroidPaintContext.Geometry(
+                        getWidth(),
+                        getHeight(),
+                        getWidth(),
+                        getHeight(),
+                        0,
+                        0
+                ), 0);
         view.paint(context, index);
     }
 
-    private void drawFooter(Canvas canvas, AnimationProvider animator) {
-        final ZLView view = ZLApplication.Instance().getCurrentView();
-        final ZLView.FooterArea footer = view.getFooterArea();
 
-        if (footer == null) {
-            myFooterBitmap = null;
-            return;
-        }
-
-        if (myFooterBitmap != null && (myFooterBitmap.getWidth() != getWidth() || myFooterBitmap.getHeight() != footer.getHeight())) {
-            myFooterBitmap = null;
-        }
-        if (myFooterBitmap == null) {
-            myFooterBitmap = Bitmap.createBitmap(getWidth(), footer.getHeight(), Bitmap.Config.RGB_565);
-        }
-        final ZLAndroidPaintContext context = new ZLAndroidPaintContext(mySystemInfo, new Canvas(myFooterBitmap), new ZLAndroidPaintContext.Geometry(getWidth(), getHeight(), getWidth(), footer.getHeight(), 0, getMainAreaHeight()), view.isScrollbarShown() ? getVerticalScrollbarWidth() : 0);
-        footer.paint(context);
-        final int voffset = getHeight() - footer.getHeight();
-
-            canvas.drawBitmap(myFooterBitmap, 0, voffset, myPaint);
-    }
-
-    /**
-     * 静止中画
-     *
-     * @param canvas
-     */
-    private void onDrawStatic(final Canvas canvas) {
-        //画出小说部分
+    private void onDrawStatic(final Canvas canvas) {  // 滑动完后调用静态时调用
+        /**
+         * 从myBitmapManager获取一张Bitmap,画到画布上
+         * myBitmapManager.getBitmap(ZLView.PageIndex.current)是自己创建的canvas,将该view的canva和其连起来才可以显示在view上
+         */
         canvas.drawBitmap(myBitmapManager.getBitmap(ZLView.PageIndex.current), 0, 0, myPaint);
-        drawFooter(canvas, null);
-        post(new Runnable() {
+        post(new Runnable() { // 将runnable放到消息队列中
             public void run() {
-                prepareService.execute(new Runnable() {
+                PrepareService.execute(new Runnable() {
                     public void run() {
-                        final ZLView view = ZLApplication.Instance().getCurrentView();
-                        final ZLAndroidPaintContext context = new ZLAndroidPaintContext(mySystemInfo, canvas, new ZLAndroidPaintContext.Geometry(getWidth(), getHeight(), getWidth(), getMainAreaHeight(), 0, 0), view.isScrollbarShown() ? getVerticalScrollbarWidth() : 0);
-                        view.preparePage(context, ZLView.PageIndex.next);
+                        final ZLView view = ZLApplication.Instance().getCurrentView(); // 得到当前view
+                        final ZLAndroidPaintContext context = new ZLAndroidPaintContext(
+                                mySystemInfo, canvas,
+                                new ZLAndroidPaintContext.Geometry(getWidth(), getHeight(), getWidth(), getHeight(), 0, 0), 0);
+                        view.preparePage(context, ZLView.PageIndex.next); // 准备下一页
                     }
                 });
             }
@@ -291,20 +291,15 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
     public boolean onTrackballEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             onKeyDown(KeyEvent.KEYCODE_DPAD_CENTER, null);
-        }else {
-            ZLApplication.Instance().getCurrentView().onTrackballRotated((int)(10 * event.getX()), (int)(10 * event.getY()));
+        } else {
+            ZLApplication.Instance().getCurrentView().onTrackballRotated((int) (10 * event.getX()), (int) (10 * event.getY()));
         }
         return true;
     }
 
-    /**
-     * 长点击
-     */
     private class LongClickRunnable implements Runnable {
-
         @Override
         public void run() {
-            //长点击和短点击的区分
             if (performLongClick()) {
                 myLongClickPerformed = true;
             }
@@ -323,11 +318,7 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
         postDelayed(myPendingLongClickRunnable, 2 * ViewConfiguration.getLongPressTimeout());
     }
 
-    /**
-     * 短点击
-     */
     private class ShortClickRunnable implements Runnable {
-
         @Override
         public void run() {
             final ZLView view = ZLApplication.Instance().getCurrentView();
@@ -340,88 +331,38 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
     private volatile ShortClickRunnable myPendingShortClickRunnable;
 
     private volatile boolean myPendingPress;
-    /**
-     * 判断是否为双击
-     */
     private volatile boolean myPendingDoubleTap;
     private int myPressedX, myPressedY;
     private boolean myScreenIsTouched;
 
-    /**
-     * 获取点击位置的x,y值;
-     * 如果是x值是从大到小，则说明是往前一页翻;
-     * 如果是x值是从小到大，则说明是往后一页翻;
-     * 这样我们只需要传入不同的Mode即可
-     * <p/>
-     * <p/>
-     * 功能：
-     * 滑动动作（重要）
-     * 1.点击控件下部中间 出现菜单
-     * 2.点击控件上部分中间出现导航（跳页的进度条）
-     * 3.点击左部分跳转前页，右部分跳转后页
-     * 4.滑动从左向右前页，否则后页
-     *
-     * @param event
-     *
-     * @return
-     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        int x = (int)event.getX();
-        int y = (int)event.getY();
+        int x = (int) event.getX();
+        int y = (int) event.getY();
 
         final ZLView view = ZLApplication.Instance().getCurrentView();
-
         switch (event.getAction()) {
-
             case MotionEvent.ACTION_CANCEL:
                 myPendingDoubleTap = false;
                 myPendingPress = false;
                 myScreenIsTouched = false;
                 myLongClickPerformed = false;
-
                 if (myPendingShortClickRunnable != null) {
                     removeCallbacks(myPendingShortClickRunnable);
                     myPendingShortClickRunnable = null;
                 }
-
                 if (myPendingLongClickRunnable != null) {
                     removeCallbacks(myPendingLongClickRunnable);
                     myPendingLongClickRunnable = null;
                 }
-
                 view.onFingerEventCancelled();
-
                 break;
-
-            case MotionEvent.ACTION_DOWN:
-                //点击下去，首先判断是否有短点击（之前）
-                // 如果有，则去除，否则发送延迟消息判断是否为长点击
-                if (myPendingShortClickRunnable != null) {
-                    removeCallbacks(myPendingShortClickRunnable);
-                    myPendingShortClickRunnable = null;
-                    myPendingDoubleTap = true;
-                }else {
-                    postLongClickRunnable();
-                    myPendingPress = true;
-                }
-
-                //记录按下位置，设置触摸标识为true
-                myScreenIsTouched = true;
-                myPressedX = x;
-                myPressedY = y;
-
-                break;
-
             case MotionEvent.ACTION_UP:
-                //判断是否为双击
                 if (myPendingDoubleTap) {
                     view.onFingerDoubleTap(x, y);
-
-                }else if (myLongClickPerformed) {
+                } else if (myLongClickPerformed) {
                     view.onFingerReleaseAfterLongPress(x, y);
-
-                }else {
+                } else {
                     if (myPendingLongClickRunnable != null) {
                         removeCallbacks(myPendingLongClickRunnable);
                         myPendingLongClickRunnable = null;
@@ -432,31 +373,40 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
                                 myPendingShortClickRunnable = new ShortClickRunnable();
                             }
                             postDelayed(myPendingShortClickRunnable, ViewConfiguration.getDoubleTapTimeout());
-                        }else {
+                        } else {
                             view.onFingerSingleTap(x, y);
                         }
-                    }else {
+                    } else {
                         view.onFingerRelease(x, y);
                     }
                 }
-
                 myPendingDoubleTap = false;
                 myPendingPress = false;
                 myScreenIsTouched = false;
                 break;
-
+            case MotionEvent.ACTION_DOWN:
+                if (myPendingShortClickRunnable != null) {
+                    removeCallbacks(myPendingShortClickRunnable);
+                    myPendingShortClickRunnable = null;
+                    myPendingDoubleTap = true;
+                } else {
+                    postLongClickRunnable();
+                    myPendingPress = true;
+                }
+                myScreenIsTouched = true;
+                myPressedX = x;
+                myPressedY = y;
+                break;
             case MotionEvent.ACTION_MOVE: {
-                //判断是否移动
                 final int slop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
-                final boolean isAMove = Math.abs(myPressedX - x) > slop || Math.abs(myPressedY - y) > slop;
-
+                final boolean isAMove =
+                        Math.abs(myPressedX - x) > slop || Math.abs(myPressedY - y) > slop;
                 if (isAMove) {
                     myPendingDoubleTap = false;
                 }
-
                 if (myLongClickPerformed) {
                     view.onFingerMoveAfterLongPress(x, y);
-                }else {
+                } else {
                     if (myPendingPress) {
                         if (isAMove) {
                             if (myPendingShortClickRunnable != null) {
@@ -471,13 +421,17 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
                         }
                     }
                     if (!myPendingPress) {
+                        // 开始切换 surfaceview
+                        if(isCurlAnimation()){
+                            ZLApplication.Instance().getMyWindow().hideViewWidget(true);
+                            return true;
+                        }
                         view.onFingerMove(x, y);
                     }
                 }
                 break;
             }
         }
-
         return true;
     }
 
@@ -495,11 +449,12 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
         final ZLApplication application = ZLApplication.Instance();
         final ZLKeyBindings bindings = application.keyBindings();
 
-        if (bindings.hasBinding(keyCode, true) || bindings.hasBinding(keyCode, false)) {
+        if (bindings.hasBinding(keyCode, true) ||
+                bindings.hasBinding(keyCode, false)) {
             if (myKeyUnderTracking != -1) {
                 if (myKeyUnderTracking == keyCode) {
                     return true;
-                }else {
+                } else {
                     myKeyUnderTracking = -1;
                 }
             }
@@ -507,10 +462,10 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
                 myKeyUnderTracking = keyCode;
                 myTrackingStartTime = System.currentTimeMillis();
                 return true;
-            }else {
+            } else {
                 return application.runActionByKey(keyCode, false);
             }
-        }else {
+        } else {
             return false;
         }
     }
@@ -519,14 +474,17 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         if (myKeyUnderTracking != -1) {
             if (myKeyUnderTracking == keyCode) {
-                final boolean longPress = System.currentTimeMillis() > myTrackingStartTime + ViewConfiguration.getLongPressTimeout();
+                final boolean longPress = System.currentTimeMillis() >
+                        myTrackingStartTime + ViewConfiguration.getLongPressTimeout();
                 ZLApplication.Instance().runActionByKey(keyCode, longPress);
             }
             myKeyUnderTracking = -1;
             return true;
-        }else {
+        } else {
             final ZLKeyBindings bindings = ZLApplication.Instance().keyBindings();
-            return bindings.hasBinding(keyCode, false) || bindings.hasBinding(keyCode, true);
+            return
+                    bindings.hasBinding(keyCode, false) ||
+                            bindings.hasBinding(keyCode, true);
         }
     }
 
@@ -542,7 +500,7 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
             final int to = view.getScrollbarThumbLength(animator.getPageToScrollTo());
             final int percent = animator.getScrolledPercent();
             return (from * (100 - percent) + to * percent) / 100;
-        }else {
+        } else {
             return view.getScrollbarThumbLength(ZLView.PageIndex.current);
         }
     }
@@ -559,7 +517,7 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
             final int to = view.getScrollbarThumbPosition(animator.getPageToScrollTo());
             final int percent = animator.getScrolledPercent();
             return (from * (100 - percent) + to * percent) / 100;
-        }else {
+        } else {
             return view.getScrollbarThumbPosition(ZLView.PageIndex.current);
         }
     }
@@ -573,13 +531,53 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
         return view.getScrollbarFullSize();
     }
 
-    private int getMainAreaHeight() {
-        final ZLView.FooterArea footer = ZLApplication.Instance().getCurrentView().getFooterArea();
-        return footer != null ? getHeight() - footer.getHeight() : getHeight();
-    }
-
-    @Override
     protected void updateColorLevel() {
         ViewUtil.setColorLevel(myPaint, myColorLevel);
+    }
+
+    public final void setScreenBrightness(int percent) { // 禁止子类覆盖
+        if (percent < 1) {
+            percent = 1;
+        } else if (percent > 100) {
+            percent = 100;
+        }
+
+        final Context context = getContext();
+        if (!(context instanceof FBReaderMainActivity)) {
+            return;
+        }
+
+        final float level;
+        final Integer oldColorLevel = myColorLevel;
+        if (percent >= 25) {
+            // 100 => 1f; 25 => .01f
+            level = .01f + (percent - 25) * .99f / 75;
+            myColorLevel = null;
+        } else {
+            level = .01f;
+            myColorLevel = 0x60 + (0xFF - 0x60) * Math.max(percent, 0) / 25;
+        }
+
+        final FBReaderMainActivity activity = (FBReaderMainActivity) context;
+        activity.getZLibrary().ScreenBrightnessLevelOption.setValue(percent);
+        activity.setScreenBrightnessSystem(level);
+        if (oldColorLevel != myColorLevel) {
+            updateColorLevel();
+            postInvalidate();
+        }
+    }
+
+    public final int getScreenBrightness() {
+        if (myColorLevel != null) {
+            return (myColorLevel - 0x60) * 25 / (0xFF - 0x60);
+        }
+
+        final Context context = getContext();
+        if (!(context instanceof FBReaderMainActivity)) {
+            return 50;
+        }
+        final float level = ((FBReaderMainActivity) context).getScreenBrightnessSystem();
+        // level = .01f + (percent - 25) * .99f / 75;
+        return 25 + (int) ((level - .01f) * 75 / .99f);
     }
 }
