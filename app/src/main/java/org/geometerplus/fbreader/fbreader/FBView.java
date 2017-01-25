@@ -56,9 +56,9 @@ public final class FBView extends ZLTextView {
 
     public void setModel(ZLTextModel model) {
         super.setModel(model);
-//        if (myFooter != null) {
-//            myFooter.resetTOCMarks();
-//        }
+        if (myFooter != null) {
+            myFooter.resetTOCMarks();
+        }
     }
 
     private int myStartY;
@@ -409,17 +409,17 @@ public final class FBView extends ZLTextView {
 
     @Override
     public ZLColor getTextColor(ZLTextHyperlink hyperlink) {
+        Logger.e("这里是返回要设置搜索关键字的颜色");
         final ColorProfile profile = myViewOptions.getColorProfile();
         switch (hyperlink.Type) {
             default:
-                return null;
-//            case FBHyperlinkType.NONE:
-//                return profile.RegularTextOption.getValue();
-//            case FBHyperlinkType.INTERNAL:
-//            case FBHyperlinkType.FOOTNOTE:
-//                return myReader.Collection.isHyperlinkVisited(myReader.getCurrentBook(), hyperlink.Id) ? profile.VisitedHyperlinkTextOption.getValue() : profile.HyperlinkTextOption.getValue();
-//            case FBHyperlinkType.EXTERNAL:
-//                return profile.HyperlinkTextOption.getValue();
+            case FBHyperlinkType.NONE:
+                return profile.RegularTextOption.getValue();
+            case FBHyperlinkType.INTERNAL:
+            case FBHyperlinkType.FOOTNOTE:
+                return myReader.Collection.isHyperlinkVisited(myReader.getCurrentBook(), hyperlink.Id) ? profile.VisitedHyperlinkTextOption.getValue() : profile.HyperlinkTextOption.getValue();
+            case FBHyperlinkType.EXTERNAL:
+                return profile.HyperlinkTextOption.getValue();
 
 
         }
@@ -427,14 +427,12 @@ public final class FBView extends ZLTextView {
 
     @Override
     public ZLColor getHighlightingBackgroundColor() {
-//        return myViewOptions.getColorProfile().HighlightingBackgroundOption.getValue();
-        return null;
+        return myViewOptions.getColorProfile().HighlightingBackgroundOption.getValue();
     }
 
     @Override
     public ZLColor getHighlightingForegroundColor() {
-//        return myViewOptions.getColorProfile().HighlightingForegroundOption.getValue();
-        return null;
+        return myViewOptions.getColorProfile().HighlightingForegroundOption.getValue();
     }
 
     private abstract class Footer implements FooterArea {
@@ -575,7 +573,7 @@ public final class FBView extends ZLTextView {
             //final ZLColor bgColor = getBackgroundColor();
             // TODO: separate color option for footer color
             final ZLColor fgColor = getTextColor(ZLTextHyperlink.NO_LINK);
-//            final ZLColor fillColor = myViewOptions.getColorProfile().FooterFillOption.getValue();
+            final ZLColor fillColor = myViewOptions.getColorProfile().FooterFillOption.getValue();
 
             final int left = getLeftMargin();
             final int right = context.getWidth() - getRightMargin();
@@ -589,7 +587,7 @@ public final class FBView extends ZLTextView {
             // draw info text
             final String infoString = buildInfoString(pagePosition, " ");
             final int infoWidth = context.getStringWidth(infoString);
-//            context.setTextColor(fgColor);
+            context.setTextColor(fgColor);
             context.drawString(right - infoWidth, height - delta, infoString);
 
             // draw gauge
@@ -605,7 +603,7 @@ public final class FBView extends ZLTextView {
 
             final int gaugeInternalRight = left + lineWidth + (int) (1.0 * gaugeWidth * pagePosition.Current / pagePosition.Total);
 
-//            context.setFillColor(fillColor);
+            context.setFillColor(fillColor);
             context.fillRectangle(left + 1, height - 2 * lineWidth, gaugeInternalRight, lineWidth + 1);
 
             final FooterOptions footerOptions = myViewOptions.getFooterOptions();
@@ -628,16 +626,16 @@ public final class FBView extends ZLTextView {
 
         public synchronized void paint(ZLPaintContext context) {
             final ColorProfile cProfile = myViewOptions.getColorProfile();
-//            context.clear(cProfile.FooterNGBackgroundOption.getValue());
+            context.clear(cProfile.FooterNGBackgroundOption.getValue());
 
             final BookModel model = myReader.Model;
             if (model == null) {
                 return;
             }
 
-//            final ZLColor textColor = cProfile.FooterNGForegroundOption.getValue();
-//            final ZLColor readColor = cProfile.FooterNGForegroundOption.getValue();
-//            final ZLColor unreadColor = cProfile.FooterNGForegroundUnreadOption.getValue();
+            final ZLColor textColor = cProfile.FooterNGForegroundOption.getValue();
+            final ZLColor readColor = cProfile.FooterNGForegroundOption.getValue();
+            final ZLColor unreadColor = cProfile.FooterNGForegroundUnreadOption.getValue();
 
             final int left = getLeftMargin();
             final int right = context.getWidth() - getRightMargin();
@@ -650,7 +648,7 @@ public final class FBView extends ZLTextView {
             // draw info text
             final String infoString = buildInfoString(pagePosition, "  ");
             final int infoWidth = context.getStringWidth(infoString);
-//            context.setTextColor(textColor);
+            context.setTextColor(textColor);
             context.drawString(right - infoWidth, (height + charHeight + 1) / 2, infoString);
 
             // draw gauge
@@ -659,10 +657,10 @@ public final class FBView extends ZLTextView {
             final int v = height / 2;
 
             context.setLineWidth(lineWidth);
-//            context.setLineColor(readColor);
+            context.setLineColor(readColor);
             context.drawLine(left, v, gaugeInternalRight, v);
             if (gaugeInternalRight < gaugeRight) {
-//                context.setLineColor(unreadColor);
+                context.setLineColor(unreadColor);
                 context.drawLine(gaugeInternalRight + 1, v, gaugeRight, v);
             }
 
@@ -682,7 +680,7 @@ public final class FBView extends ZLTextView {
                     }
                 }
                 for (int l : labels) {
-//                    context.setLineColor(l <= gaugeInternalRight ? readColor : unreadColor);
+                    context.setLineColor(l <= gaugeInternalRight ? readColor : unreadColor);
                     context.drawLine(l, v + 3, l, v - lineWidth - 2);
                 }
             }

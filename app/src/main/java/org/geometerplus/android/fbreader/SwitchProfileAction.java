@@ -39,7 +39,7 @@ class SwitchProfileAction extends FBAndroidAction {
 
     @Override
     protected void run(Object... params) {
-        Logger.e("这里是设置背景色的东西-------------------------");
+        Logger.e("这里是设置背景色的东西-------------------------+wallpapers/bg_green.png");
         Reader.ViewOptions.ColorProfileName.setValue(myProfileName);
         Reader.getViewWidget().reset();
         Reader.getViewWidget().repaint();

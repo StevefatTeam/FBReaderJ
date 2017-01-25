@@ -21,6 +21,7 @@ package org.geometerplus.zlibrary.ui.android.library;
 
 import android.app.Application;
 
+import com.orhanobut.logger.LogLevel;
 import com.orhanobut.logger.Logger;
 
 import org.geometerplus.android.fbreader.config.ConfigShadow;
@@ -49,7 +50,7 @@ public abstract class ZLAndroidApplication extends Application {
         //获取程序信息
         myLibrary = new ZLAndroidLibrary(this);
 
-        Logger.init("FBReader");
+        Logger.init("FBReader").logLevel(LogLevel.NONE);
     }
 
     public final ZLAndroidLibrary library() {

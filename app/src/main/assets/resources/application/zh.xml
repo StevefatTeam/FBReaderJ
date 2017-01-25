@@ -107,7 +107,12 @@
     </node>
     <node name="dialog">
         <node name="waitMessage">
+            <node name="search" value="搜索中，请等待…"/>
+            <node name="loadInfo" value="信息加载中，请等待…"/>
             <node name="loadingBook" value="图书加载中，请等待…"/>
+            <node name="loadingBookList" value="书库加载中，请等待…"/>
+            <node name="creatingBooksDatabase" value="正在创建图书数据库，请等待…"/>
+            <node name="updatingBooksDatabase" value="正在更新图书数据库，请等待…"/>
         </node>
     </node>
     <node name="Preferences" toBeTranslated="true" value="FBReader settings">
@@ -734,4 +739,5 @@
             <node name="library" toBeTranslated="true" value="Open library"/>
         </node>
     </node>
+
 </resources>

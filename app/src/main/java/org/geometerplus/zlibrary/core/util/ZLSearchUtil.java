@@ -19,6 +19,8 @@
 
 package org.geometerplus.zlibrary.core.util;
 
+import com.orhanobut.logger.Logger;
+
 public abstract class ZLSearchUtil {
 
     private ZLSearchUtil() {
@@ -40,6 +42,7 @@ public abstract class ZLSearchUtil {
     }
 
     public static Result find(char[] text, int offset, int length, final ZLSearchPattern pattern, int pos) {
+        Logger.e("这里是搜索进行中----"+text.toString()+"--"+offset+"===="+length);
         if (pos < 0) {
             pos = 0;
         }

@@ -25,7 +25,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="20dp"
             android:drawableLeft="@drawable/light_small"
-            android:textColor="@android:color/darker_gray" />
+            android:textColor="@android:color/darker_gray"/>
 
         <SeekBar
             android:id="@+id/light_slider"
@@ -34,7 +34,7 @@
             android:layout_centerInParent="true"
             android:layout_marginLeft="55dp"
             android:layout_marginRight="55dp"
-            android:scrollbarSize="100sp" />
+            android:scrollbarSize="100sp"/>
 
         <TextView
             android:id="@+id/tv_light_add"
@@ -44,7 +44,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="20dp"
             android:drawableLeft="@drawable/lights"
-            android:textColor="@android:color/darker_gray" />
+            android:textColor="@android:color/darker_gray"/>
     </RelativeLayout>
 
 
@@ -63,7 +63,7 @@
             android:gravity="center"
             android:text="A-"
             android:textColor="#FFFFFF"
-            android:textSize="16sp" />
+            android:textSize="16sp"/>
 
         <TextView
             android:id="@+id/tv_font_size"
@@ -73,7 +73,7 @@
             android:gravity="center"
             android:text="36"
             android:textColor="#FFFFFF"
-            android:textSize="13sp" />
+            android:textSize="13sp"/>
 
         <TextView
             android:id="@+id/tv_font_add"
@@ -84,7 +84,7 @@
             android:gravity="center"
             android:text="A+"
             android:textColor="#FFFFFF"
-            android:textSize="16sp" />
+            android:textSize="16sp"/>
 
 
         <TextView
@@ -96,7 +96,8 @@
             android:gravity="center"
             android:text="L+"
             android:textColor="#FFFFFF"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            />
 
         <TextView
             android:id="@+id/tv_lineSpace_size"
@@ -106,7 +107,8 @@
             android:gravity="center"
             android:text="36"
             android:textColor="#FFFFFF"
-            android:textSize="13sp" />
+            android:textSize="13sp"
+            />
 
         <TextView
             android:id="@+id/tv_lineSpace_minus"
@@ -118,7 +120,8 @@
             android:gravity="center"
             android:text="L-"
             android:textColor="#FFFFFF"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            />
     </RelativeLayout>
 
 
@@ -139,7 +142,7 @@
             android:gravity="center"
             android:text="仿真"
             android:textColor="#FFFFFF"
-            android:textSize="15sp" />
+            android:textSize="15sp"/>
 
         <TextView
             android:id="@+id/tv_page_cover"
@@ -152,7 +155,7 @@
             android:gravity="center"
             android:text="覆盖"
             android:textColor="#FFFFFF"
-            android:textSize="15sp" />
+            android:textSize="15sp"/>
 
         <TextView
             android:id="@+id/tv_page_slide"
@@ -165,7 +168,7 @@
             android:gravity="center"
             android:text="滑动"
             android:textColor="#FFFFFF"
-            android:textSize="15sp" />
+            android:textSize="15sp"/>
 
         <TextView
             android:id="@+id/tv_page_none"
@@ -178,7 +181,7 @@
             android:gravity="center"
             android:text="无"
             android:textColor="#FFFFFF"
-            android:textSize="15sp" />
+            android:textSize="15sp"/>
     </LinearLayout>
 
 
@@ -197,8 +200,8 @@
             android:layout_centerVertical="true"
             android:layout_weight="1"
             android:src="@drawable/bg_white"
-            app:civ_border_width="2dp"
-            app:civ_border_color="#FF000000"/>
+            app:civ_border_color="#FF000000"
+            app:civ_border_width="2dp"/>
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/bg_grey"
@@ -208,8 +211,8 @@
             android:layout_marginLeft="18dp"
             android:layout_weight="1"
             android:src="@drawable/bg_grey"
-            app:civ_border_width="2dp"
-            app:civ_border_color="#FF000000" />
+            app:civ_border_color="#FF000000"
+            app:civ_border_width="2dp"/>
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/bg_vine_grey"
@@ -219,8 +222,9 @@
             android:layout_marginLeft="18dp"
             android:layout_weight="1"
             android:src="@drawable/bg_vine_grey"
-            app:civ_border_width="2dp"
-            app:civ_border_color="#FF000000" />
+            android:visibility="gone"
+            app:civ_border_color="#FF000000"
+            app:civ_border_width="2dp"/>
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/bg_vine_white"
@@ -231,8 +235,8 @@
             android:layout_marginLeft="18dp"
             android:layout_weight="1"
             android:src="@drawable/bg_vine_white"
-            app:civ_border_width="2dp"
-            app:civ_border_color="#FF000000" />
+            app:civ_border_color="#FF000000"
+            app:civ_border_width="2dp"/>
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/bg_green"
@@ -243,8 +247,8 @@
             android:layout_marginLeft="18dp"
             android:layout_weight="1"
             android:src="@drawable/bg_green"
-            app:civ_border_width="2dp"
-            app:civ_border_color="#FF000000" />
+            app:civ_border_color="#FF000000"
+            app:civ_border_width="2dp"/>
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/bg_night"
@@ -255,8 +259,9 @@
             android:layout_marginLeft="18dp"
             android:layout_weight="1"
             android:src="@drawable/bg_night"
-            app:civ_border_width="2dp"
-            app:civ_border_color="#FF000000" />
+            android:visibility="gone"
+            app:civ_border_color="#FF000000"
+            app:civ_border_width="2dp"/>
     </LinearLayout>
 
 
@@ -265,7 +270,8 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/tv_align_left"
@@ -275,7 +281,7 @@
             android:background="@drawable/er"
             android:gravity="center"
             android:textColor="#FFFFFF"
-            android:textSize="15sp" />
+            android:textSize="15sp"/>
 
         <TextView
             android:id="@+id/tv_align_right"
@@ -286,7 +292,7 @@
             android:background="@drawable/ep"
             android:gravity="center"
             android:textColor="#FFFFFF"
-            android:textSize="15sp" />
+            android:textSize="15sp"/>
 
         <TextView
             android:id="@+id/tv_align"
@@ -297,7 +303,7 @@
             android:background="@drawable/en"
             android:gravity="center"
             android:textColor="#FFFFFF"
-            android:textSize="15sp" />
+            android:textSize="15sp"/>
 
         <TextView
             android:id="@+id/tv_align_center"
@@ -308,7 +314,7 @@
             android:background="@drawable/ev"
             android:gravity="center"
             android:textColor="#FFFFFF"
-            android:textSize="15sp" />
+            android:textSize="15sp"/>
 
         <TextView
             android:id="@+id/tv_page_mode"
@@ -319,7 +325,7 @@
             android:gravity="center"
             android:text="左右"
             android:textColor="#DAc8c8c8"
-            android:textSize="13sp" />
+            android:textSize="13sp"/>
 
         <TextView
             android:id="@+id/tv_setting"
@@ -327,6 +333,6 @@
             android:layout_height="42dp"
             android:layout_marginLeft="8dp"
             android:background="@drawable/setting"
-            android:gravity="center" />
+            android:gravity="center"/>
     </LinearLayout>
 </org.geometerplus.android.fbreader.SettingWindow>

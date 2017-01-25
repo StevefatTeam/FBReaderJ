@@ -28,9 +28,12 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.orhanobut.logger.Logger;
+
 import org.geometerplus.android.fbreader.api.FBReaderIntents;
 import org.geometerplus.android.util.OrientationUtil;
 import org.geometerplus.fbreader.bookmodel.TOCTree;
+import org.geometerplus.fbreader.fbreader.ActionCode;
 import org.geometerplus.fbreader.fbreader.FBReaderApp;
 import org.geometerplus.fbreader.fbreader.options.ColorProfile;
 import org.geometerplus.zlibrary.core.application.ZLApplication;
@@ -139,6 +142,7 @@ final class NavigationPopup extends ZLApplication.PopupPanel {
         final TextView text = (TextView) myWindow.findViewById(R.id.navigation_text);
         final TextView toc = (TextView) myWindow.findViewById(R.id.navigation_toc);
         final TextView fonts = (TextView) myWindow.findViewById(R.id.navigation_fonts);
+        final TextView search = (TextView) myWindow.findViewById(R.id.navigation_search);
         light = (TextView) myWindow.findViewById(R.id.navigation_light);
         dark = (TextView) myWindow.findViewById(R.id.navigation_dark);
         final TextView pre_character = (TextView) myWindow.findViewById(R.id.pre_character);
@@ -161,6 +165,17 @@ final class NavigationPopup extends ZLApplication.PopupPanel {
             public void onClick(View v) {
                 Application.hideActivePopup();
                 ((SettingPopup) myFBReader.getPopupById(SettingPopup.ID)).runNavigation();
+            }
+        });
+        /**
+         * 这个是搜索所有的结果数据
+         */
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Logger.e("这里是搜索本书的数据");
+                Application.hideActivePopup();
+                myFBReader.runAction(ActionCode.SEARCH);
             }
         });
 

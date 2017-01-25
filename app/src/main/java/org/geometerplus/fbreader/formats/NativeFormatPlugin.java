@@ -108,7 +108,7 @@ public class NativeFormatPlugin extends BuiltinFormatPlugin {
     synchronized public void readModel(BookModel model) throws BookReadingException {
         final int code;
         final String tempDirectory = SystemInfo.tempDirectory();
-        Logger.e("这里是具体的解析----------------jni 的解析方式"+model.toString()+"---------"+tempDirectory);
+        Logger.e("这里是具体的解析----------------jni 的解析方式");
         synchronized (ourNativeLock) {
             code = readModelNative(model, tempDirectory);
         }

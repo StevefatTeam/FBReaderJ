@@ -99,6 +99,7 @@ public class BackgroundPreference extends Preference {
     }
 
     public void update(Intent data) {
+        Logger.e("初始化设置背景颜色？-------------");
         final String value = data.getStringExtra(VALUE_KEY);
         if (value != null) {
             myProfile.WallpaperOption.setValue(value);

@@ -19,6 +19,8 @@
 
 package org.geometerplus.zlibrary.text.view;
 
+import com.orhanobut.logger.Logger;
+
 import org.geometerplus.zlibrary.core.application.ZLApplication;
 import org.geometerplus.zlibrary.core.filesystem.ZLFile;
 import org.geometerplus.zlibrary.core.library.ZLibrary;
@@ -292,6 +294,7 @@ abstract class ZLTextViewBase extends ZLView {
 
     final void drawWord(int x, int y, ZLTextWord word, int start, int length, boolean addHyphenationSign, ZLColor color) {
         final ZLPaintContext context = getContext();
+
         if (start == 0 && length == -1) {
             drawString(context, x, y, word.Data, word.Offset, word.Length, word.getMark(), color, 0);
         }else {

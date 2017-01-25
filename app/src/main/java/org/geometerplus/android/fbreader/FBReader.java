@@ -30,6 +30,8 @@ import android.view.*;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.orhanobut.logger.Logger;
+
 import org.geometerplus.android.fbreader.api.*;
 import org.geometerplus.android.fbreader.formatPlugin.PluginUtil;
 import org.geometerplus.android.fbreader.httpd.DataService;
@@ -58,7 +60,7 @@ import org.geometerplus.zlibrary.core.view.ZLViewWidget;
 import org.geometerplus.zlibrary.text.view.ZLTextRegion;
 import org.geometerplus.zlibrary.text.view.ZLTextView;
 import org.geometerplus.zlibrary.ui.android.R;
-import org.geometerplus.zlibrary.ui.android.error.ErrorKeys;
+//import org.geometerplus.zlibrary.ui.android.error.ErrorKeys;
 import org.geometerplus.zlibrary.ui.android.library.ZLAndroidApplication;
 import org.geometerplus.zlibrary.ui.android.library.ZLAndroidLibrary;
 import org.geometerplus.zlibrary.ui.android.view.AndroidFontUtil;
@@ -406,6 +408,7 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
         }else if (FBReaderIntents.Action.PLUGIN.equals(action)) {
             new RunPluginAction(this, myFBReaderApp, data).run();
         }else if (Intent.ACTION_SEARCH.equals(action)) {
+            Logger.e("这里是输入要搜索的数据后，回车走的方法------");
             final String pattern = intent.getStringExtra(SearchManager.QUERY);
             final Runnable runnable = new Runnable() {
                 public void run() {
@@ -985,12 +988,12 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
     public void processException(Exception exception) {
         exception.printStackTrace();
 
-        final Intent intent = new Intent(FBReaderIntents.Action.ERROR, new Uri.Builder().scheme(exception.getClass().getSimpleName()).build());
-        intent.setPackage(FBReaderIntents.DEFAULT_PACKAGE);
-        intent.putExtra(ErrorKeys.MESSAGE, exception.getMessage());
-        final StringWriter stackTrace = new StringWriter();
-        exception.printStackTrace(new PrintWriter(stackTrace));
-        intent.putExtra(ErrorKeys.STACKTRACE, stackTrace.toString());
+//        final Intent intent = new Intent(FBReaderIntents.Action.ERROR, new Uri.Builder().scheme(exception.getClass().getSimpleName()).build());
+//        intent.setPackage(FBReaderIntents.DEFAULT_PACKAGE);
+//        intent.putExtra(ErrorKeys.MESSAGE, exception.getMessage());
+//        final StringWriter stackTrace = new StringWriter();
+//        exception.printStackTrace(new PrintWriter(stackTrace));
+//        intent.putExtra(ErrorKeys.STACKTRACE, stackTrace.toString());
         /*
         if (exception instanceof BookReadingException) {
 			final ZLFile file = ((BookReadingException)exception).File;
@@ -999,12 +1002,12 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
 			}
 		}
 		*/
-        try {
-            startActivity(intent);
-        }catch (ActivityNotFoundException e) {
-            // ignore
-            e.printStackTrace();
-        }
+//        try {
+//            startActivity(intent);
+//        }catch (ActivityNotFoundException e) {
+//            // ignore
+//            e.printStackTrace();
+//        }
     }
 
 //    @Override

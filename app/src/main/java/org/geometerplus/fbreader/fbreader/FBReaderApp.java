@@ -370,7 +370,6 @@ public final class FBReaderApp extends ZLApplication {
         } catch (BookReadingException e) {
             processException(e);
         }
-
         getViewWidget().reset();
         getViewWidget().repaint();
 

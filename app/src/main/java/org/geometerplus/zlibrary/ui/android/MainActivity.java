@@ -57,7 +57,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                File file = new File(Environment.getExternalStorageDirectory().getPath() + "/雍正皇帝.epub");
+                File file = new File(Environment.getExternalStorageDirectory().getPath() + "/book1/test1_book1.epub");
                 if (file.exists()) {
                     openFile("epub", file + "");
                 }
